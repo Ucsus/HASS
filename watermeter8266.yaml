@@ -40,7 +40,7 @@ font:
 
   - file: 'arial.ttf'
     id: font2
-    size: 14
+    size: 12
 
 spi:
   clk_pin: GPIO16
