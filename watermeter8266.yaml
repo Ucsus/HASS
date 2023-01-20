@@ -4,10 +4,8 @@ esphome:
 esp8266:
   board: esp01_1m
 
-# Enable logging
 logger:
 
-# Enable Home Assistant API
 api:
 
 ota:
@@ -21,16 +19,16 @@ wifi:
     gateway: 192.168.0.1
     subnet: 255.255.255.0
 
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
+
   ap:
     ssid: "Esphome-Web-D88A0F"
     password: "ACNHjFnYVVhF"
 
 captive_portal:
 
-text_sensor:
+sensor:
   - platform: homeassistant
-    id: inside_hum
+    id: temp
     entity_id: sensor.climate_termo
 
 font:
@@ -53,5 +51,13 @@ display:
     dc_pin: GPIO0
     reset_pin: GPIO2
     lambda: |-
-      it.print(0, 0, id(font1), "Hello World!");
+      it.printf(0, 0, id(font1), "%.1f", id(temp).state);
+
+
+      - id: page4 # Office Temp / Hum
+        lambda: |-
+          it.printf(0, 0, id(font1), "%.1f", id(officetemp).state);
+          it.printf(0, 16, id(font1), "%.1f", id(officehumid).state);
+
+
     
