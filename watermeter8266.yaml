@@ -3,6 +3,10 @@ esphome:
 
 esp8266:
   board: esp01_1m
+  restore_from_flash: true
+  
+preferences:
+  flash_write_interval: 60min
 
 # Enable logging
 logger:
@@ -28,20 +32,43 @@ wifi:
 
 captive_portal:
 
-text_sensor:
-  - platform: homeassistant
-    name: "tempo"
-    entity_id: sensor.datchik_vlazhnosti_i_temperatury_temperature
-    id: alarm_state
+# Water
+sensor:
+  - platform: pulse_counter
+    id: water
+    pin: GPIO14
+    unit_of_measurement: 'm3/min'
+    accuracy_decimals: 1
+    name: 'Water'
+    filters: 
+      - multiply: 0.01
+
+  - platform: integration
+    device_class: water
+    state_class: total
+    name: "Total water"
+    id: totalwater
+    sensor: water
+    time_unit: min
+    accuracy_decimals: 3
+    restore: true
+    filters:
+      - offset: 1.481
 
 font:
   - file: 'slkscr.ttf'
     id: font1
-    size: 14
+    size: 12
 
   - file: 'arial.ttf'
     id: font2
     size: 12
+
+  - file: 'roboto-medium.ttf'
+    id: font3
+    size: 12
+    glyphs: |-
+      !"%()+=,-_.:°0123456789АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧЩЬЫЪЭЮЯABCDEFGHIJKLMNOPQRSTUVWXYZ абвгдеёжзийклмнопрстуфхцчщьыъэюяabcdefghijklmnopqrstuvwxyz'éèàòùç/&ôœìïöñ
 
 spi:
   clk_pin: GPIO16
@@ -55,5 +82,5 @@ display:
     reset_pin: GPIO2
     lambda: |-
       // Print "Alarm State: <state>" in top center
-      it.printf(64, 0, id(font1), TextAlign::TOP_CENTER, "Temp: %s", id(alarm_state).state.c_str());
-    
+      it.printf(0, 0, id(font3), "Всего: %1f", id(totalwater).state);
+      it.printf(0, 16, id(font3), "В минуту: %1f", id(water).state);
