@@ -1,3 +1,5 @@
+#Счетчик Бентар СГВ-15Д
+
 esphome:
   name: "watermeter8266"
 
@@ -81,6 +83,5 @@ display:
     dc_pin: GPIO0
     reset_pin: GPIO2
     lambda: |-
-      // Print "Alarm State: <state>" in top center
       it.printf(0, 0, id(font3), "Всего: %1f", id(totalwater).state);
       it.printf(0, 16, id(font3), "В минуту: %1f", id(water).state);
