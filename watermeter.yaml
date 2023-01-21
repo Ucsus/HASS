@@ -1,7 +1,7 @@
 #Счетчик Бентар СГВ-15Д
 
 esphome:
-  name: "watermeter8266"
+  name: "watermeter"
 
 esp8266:
   board: esp01_1m
@@ -30,7 +30,7 @@ wifi:
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Esphome-Web-D88A0F"
-    password: "ACNHjFnYVVhF"
+    password: "UbZj1KI4fuZa"
 
 captive_portal:
 
@@ -84,5 +84,6 @@ display:
     reset_pin: GPIO2
     lambda: |-
       // Print "Alarm State: <state>" in top center
-      it.printf(64, 0, id(font1), TextAlign::TOP_CENTER, "Temp: %s", id(alarm_state).state.c_str());
+      it.printf(0, 0, id(font3), "Всего: %1f", id(totalwater).state);
+      it.printf(0, 16, id(font3), "В минуту: %1f", id(water).state);
     
