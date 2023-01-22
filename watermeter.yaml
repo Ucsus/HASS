@@ -1,12 +1,10 @@
-#Счетчик Бентар СГВ-15Д
-
 esphome:
   name: "watermeter"
 
 esp8266:
   board: esp01_1m
   restore_from_flash: true
-  
+
 preferences:
   flash_write_interval: 60min
 
@@ -42,7 +40,7 @@ sensor:
     unit_of_measurement: 'm3/min'
     accuracy_decimals: 1
     name: 'Water'
-    filters: 
+    filters:
       - multiply: 0.01
 
   - platform: integration
@@ -55,7 +53,7 @@ sensor:
     accuracy_decimals: 3
     restore: true
     filters:
-      - offset: 1.481
+      - offset: 1.532
 
 font:
   - file: 'slkscr.ttf'
@@ -83,7 +81,5 @@ display:
     dc_pin: GPIO0
     reset_pin: GPIO2
     lambda: |-
-      // Print "Alarm State: <state>" in top center
       it.printf(0, 0, id(font3), "Всего: %1f", id(totalwater).state);
-      it.printf(0, 16, id(font3), "В минуту: %1f", id(water).state);
-    
+      it.printf(0, 12, id(font3), "В минуту: %1f", id(water).state);
