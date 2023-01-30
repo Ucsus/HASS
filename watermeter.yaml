@@ -1,12 +1,15 @@
+Только что закончил 15-й поток QA Java. Бэкграунд слабенький - цсс, хтмл, всякие вордпресы, опенкарты, (прости господи) джумлы и далеко оставленные позади начинания js и python. В целом, довольно сильный курс, кмк. За 3 месяца прям левелап, хоть и не сразу всё далось. Трудные моменты и ДЗ разбираются отдельными консультациями, либо в последующих уроках. Есть чатик потока и чат всего курса, которые курируют наставники и преподаватели. Уроки онлайн и в записи. Есть много дополнительного материала, своя база знаний и доступ к последующим потокам этого курса. Предоставляют свои ресурсы под разработку. Большой плюс, что преподы не просто зачитывают курс, а прям помогают влиться в профессию, пару-тройку человек с моего потока нашли работу уже в середине прохождения курса и еще несколько к моменту написания диплома. В общем, однозначно рекомендую)substitutions:
+  pin_water_counter: GPIO14
+  relays_inverted: 'true'
+  water_open_delay: 1000ms
+  water_close_delay: 1000ms
+  warning_detect_delay: 25s
+
 esphome:
   name: "watermeter"
 
 esp8266:
   board: esp01_1m
-  restore_from_flash: true
-
-preferences:
-  flash_write_interval: 60min
 
 # Enable logging
 logger:
@@ -20,40 +23,53 @@ ota:
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
-  manual_ip:
-    static_ip: 192.168.0.197
-    gateway: 192.168.0.1
-    subnet: 255.255.255.0
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Esphome-Web-D88A0F"
-    password: "UbZj1KI4fuZa"
+    password: "TTD0u4CIbupe"
 
 captive_portal:
 
-# Water
-sensor:
-  - platform: pulse_counter
+binary_sensor:
+  - platform: gpio
+    name: water counter esp32
     id: water
-    pin: GPIO14
-    unit_of_measurement: 'm3/min'
-    accuracy_decimals: 1
-    name: 'Water'
-    filters:
-      - multiply: 0.01
+    device_class: moisture
+    pin:
+      number: $pin_water_counter
+      mode: INPUT_PULLUP
+      inverted: true
 
-  - platform: integration
-    device_class: water
-    state_class: total
-    name: "Total water"
-    id: totalwater
-    sensor: water
-    time_unit: min
-    accuracy_decimals: 3
-    restore: true
-    filters:
-      - offset: 1.532
+  - platform: gpio
+    name: gas counter esp32
+    id: gas
+    device_class: gas
+    pin:
+      number: GPIO12
+      mode: INPUT_PULLUP
+      inverted: true
+
+text_sensor:
+  - platform: homeassistant
+    entity_id: sensor.water_counter_sensor
+    id: watercountersensor
+  - platform: homeassistant
+    entity_id: sensor.water_today
+    id: watertoday
+  - platform: homeassistant
+    entity_id: sensor.water_yesterday
+    id: wateryesterday
+
+  - platform: homeassistant
+    entity_id: sensor.gas_counter_sensor
+    id: gascountersensor
+  - platform: homeassistant
+    entity_id: sensor.gas_today
+    id: gastoday
+  - platform: homeassistant
+    entity_id: sensor.gas_yesterday
+    id: gasyesterday
 
 font:
   - file: 'slkscr.ttf'
@@ -66,7 +82,7 @@ font:
 
   - file: 'roboto-medium.ttf'
     id: font3
-    size: 12
+    size: 14
     glyphs: |-
       !"%()+=,-_.:°0123456789АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧЩЬЫЪЭЮЯABCDEFGHIJKLMNOPQRSTUVWXYZ абвгдеёжзийклмнопрстуфхцчщьыъэюяabcdefghijklmnopqrstuvwxyz'éèàòùç/&ôœìïöñ
 
@@ -80,6 +96,25 @@ display:
     cs_pin: GPIO4
     dc_pin: GPIO0
     reset_pin: GPIO2
-    lambda: |-
-      it.printf(0, 0, id(font3), "Всего: %1f", id(totalwater).state);
-      it.printf(0, 12, id(font3), "В минуту: %1f", id(water).state);
+    id: oled1
+
+    pages:
+      - id: page1 # Plex currently viewing
+        lambda: |-
+          it.printf(0, 0, id(font3), "РАСХОД ВОДЫ:");
+          it.printf(0, 14, id(font3), "Всего: %sм3", id(watercountersensor).state.c_str());
+          it.printf(0, 28, id(font3), "Сегодня: %sл", id(watertoday).state.c_str());
+          it.printf(0, 48, id(font3), "Вчера: %sл", id(wateryesterday).state.c_str());
+
+      - id: page2 # Plex currently viewing
+        lambda: |-
+          it.printf(0, 0, id(font3), "РАСХОД ГАЗА:");
+          it.printf(0, 14, id(font3), "Всего: %sм3", id(gascountersensor).state.c_str());
+          it.printf(0, 28, id(font3), "Сегодня: %sм3", id(gastoday).state.c_str());
+          it.printf(0, 48, id(font3), "Вчера: %sм3", id(gasyesterday).state.c_str());
+
+interval:
+  - interval: 15s
+    then:
+      - display.page.show_next: oled1
+      - component.update: oled1
