@@ -1,1202 +1,1799 @@
-type: custom:layout-card
-layout_type: custom:grid-layout
-layout: {}
-cards:
-  - type: custom:layout-card
-    layout_type: custom:horizontal-layout
-    layout: {}
+views:
+  - title: Дом
+    icon: mdi:home-circle
+    path: home
     cards:
-      - type: custom:mushroom-template-card
-        primary: Комнаты
-        icon: mdi:mushroom
-        icon_color: white
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: conditional
+                conditions:
+                  - entity: light.osveshchenie
+                    state: 'on'
+                chip:
+                  type: template
+                  icon: mdi:lightbulb
+                  content: >-
+                    {{ expand(states.light.osveshchenie) | selectattr( 'state',
+                    'eq', 'on') | list | count }}
+                  tap_action:
+                    action: navigate
+                    navigation_path: info
+                  icon_color: yellow
+              - type: conditional
+                conditions:
+                  - entity: switch.ustroistva
+                    state: 'on'
+                chip:
+                  type: template
+                  icon: mdi:devices
+                  content: >-
+                    {{ expand(states.switch.ustroistva) | selectattr( 'state',
+                    'eq', 'on') | list | count }}
+                  tap_action:
+                    action: navigate
+                    navigation_path: info
+                  icon_color: blue
+              - type: conditional
+                conditions:
+                  - entity: binary_sensor.datchik_utechki_vody_water_leak
+                    state: 'on'
+                chip:
+                  type: template
+                  icon_color: light-blue
+                  icon: mdi:water-alert
+                  tap_action:
+                    action: more-info
+                  entity: binary_sensor.datchik_utechki_vody_water_leak
+                  card_mod:
+                    style: |
+                      ha-card {
+                        animation: blink 1s linear infinite;
+                      }
+                      @keyframes blink {
+                        50% {opacity: 0;}
+                      }  
+              - type: conditional
+                conditions:
+                  - entity: binary_sensor.datchik_utechki_gaza_gas
+                    state: 'on'
+                chip:
+                  type: template
+                  icon_color: red
+                  icon: mdi:fire-alert
+                  tap_action:
+                    action: more-info
+                  entity: binary_sensor.datchik_utechki_gaza_gas
+                  card_mod:
+                    style: |
+                      ha-card {
+                        animation: blink 1s linear infinite;
+                      }
+                      @keyframes blink {
+                        50% {opacity: 0;}
+                      }  
+              - type: template
+                content: |
+                  {{ states('sensor.energymonth') | round(1) }}
+                icon: mdi:flash
+                icon_color: yellow
+                tap_action:
+                  action: navigate
+                  navigation_path: graph
+              - type: template
+                content: |
+                  {{ states('sensor.watermonth') | round(1) }}
+                icon: mdi:water
+                icon_color: blue
+                tap_action:
+                  action: navigate
+                  navigation_path: graph
+              - type: template
+                content: |
+                  {{ states('sensor.gasmonth') | round(1) }}
+                icon: mdi:gas-burner
+                icon_color: red
+                tap_action:
+                  action: navigate
+                  navigation_path: graph
+            card_mod:
+              style: |
+                :host {
+                  --ha-card-background: var(--card-background-color);
+                }
+          - type: custom:mushroom-title-card
+            title: |-
+              {%- set time = now().hour %}
+              {%- if time <= 1 -%} Доброй ночи, {{user}}! {{'💤'}}
+              {%- elif time <= 3 -%} Доброй ночи, {{user}}! {{'😴'}}
+              {%- elif time <= 5 -%} Доброй ночи, {{user}}! {{'😪'}}
+              {%- elif time <= 7 -%} Доброе утро, {{user}}! {{'🧠'}}
+              {%- elif time <= 9 -%} Доброе утро, {{user}}! {{'🤟'}}
+              {%- elif time <= 10 -%} Доброе утро, {{user}}! {{'😘'}}
+              {%- elif time <= 13 -%} Добрый день, {{user}}! {{'😍'}}
+              {%- elif time <= 15 -%} Добрый день, {{user}}! {{'😏'}}
+              {%- elif time <= 17 -%} Добрый день, {{user}}! {{'🖖'}}
+              {%- elif time <= 19 -%} Добрый вечер, {{user}}! {{'🤩'}}
+              {%- elif time <= 22 -%} Добрый вечер, {{user}}! {{'🤗'}}
+              {%- elif time <= 23 -%} Добрый вечер, {{user}}! {{'🤫'}}
+              {%- else %} Доброй ночи, {{user}}! {{'🤫'}}
+              {%- endif -%}
+            subtitle: ''
+          - type: custom:simple-weather-card
+            entity: weather.dom
+            name: в Максаковке
+            card_mod:
+              style: |
+                ha-card {
+                  box-shadow: none;
+                  background: none;
+                }
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-template-card
+                primary: ''
+                secondary: Вкл
+                icon: mdi:lightbulb-on
+                layout: vertical
+                icon_color: amber
+                tap_action:
+                  action: navigate
+                  navigation_path: info
+                card_mod:
+                  style: |
+                    ha-card { 
+                      background: var(--card-background-color);
+                      width: 66px;
+                      border-radius: 30px;
+                      margin-left: auto;
+                      margin-right: auto;
+                      margin-bottom: 2px;
+                      }
+              - type: custom:mushroom-template-card
+                primary: ''
+                secondary: Счёт
+                icon: mdi:chart-areaspline
+                icon_color: blue
+                layout: vertical
+                tap_action:
+                  action: navigate
+                  navigation_path: graph
+                card_mod:
+                  style: |
+                    ha-card { 
+                      background: var(--card-background-color);
+                      width: 66px;
+                      border-radius: 30px;
+                      margin-left: auto;
+                      margin-right: auto;
+                      margin-bottom: 2px;
+                    }
+              - type: custom:mushroom-template-card
+                primary: ''
+                secondary: Авто
+                icon: mdi:robot
+                icon_color: green
+                layout: vertical
+                tap_action:
+                  action: navigate
+                  navigation_path: auto
+                card_mod:
+                  style: |
+                    ha-card { 
+                      background: var(--card-background-color);
+                      width: 66px;
+                      border-radius: 30px;
+                      margin-left: auto;
+                      margin-right: auto;
+                      margin-bottom: 2px;
+                    }
+              - type: custom:mushroom-template-card
+                primary: ''
+                secondary: HASS
+                icon: mdi:home-assistant
+                layout: vertical
+                icon_color: red
+                tap_action:
+                  action: navigate
+                  navigation_path: hass
+                card_mod:
+                  style: |
+                    ha-card { 
+                      background: var(--card-background-color);
+                      width: 66px;
+                      border-radius: 30px;
+                      margin-left: auto;
+                      margin-right: auto;
+                      margin-bottom: 2px;
+                    }
+              - type: custom:mushroom-template-card
+                primary: ''
+                secondary: Режим
+                icon: mdi:palette
+                layout: vertical
+                icon_color: cyan
+                tap_action:
+                  action: navigate
+                  navigation_path: scenes
+                card_mod:
+                  style: |
+                    ha-card { 
+                      background: var(--card-background-color);
+                      width: 66px;
+                      border-radius: 30px;
+                      margin-left: auto;
+                      margin-right: auto;
+                      margin-bottom: 2px;
+                    }
         card_mod:
           style: |
             ha-card {
-              background: rgba(var(--rgb-card-background-color), 0.7) url( '/local/images/rooms.jpg' ) center no-repeat;
-              background-size: cover;
-              background-blend-mode: overlay;
+              padding: 2px;
+              background: rgba(var(--rgb-primary-text-color), 0.01);
             }
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-template-card
+                primary: Комнаты
+                icon: mdi:mushroom
+                icon_color: white
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: rgba(var(--rgb-card-background-color), 0.7) url( '/local/images/rooms.jpg' ) center no-repeat;
+                      background-size: cover;
+                      background-blend-mode: overlay;
+                    }
+          - type: horizontal-stack
+            cards:
+              - type: custom:stack-in-card
+                cards:
+                  - type: custom:mushroom-template-card
+                    primary: Комната
+                    secondary: 🌡️ {{ states('sensor.climate_termo') | round(0) }} °C
+                    icon: mdi:laptop
+                    entity: light.komnata_osveshchenie
+                    tap_action:
+                      action: navigate
+                      navigation_path: room
+                    hold_action:
+                      action: toggle
+                    icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
+                    fill_container: true
+                    layout: horizontal
+                    multiline_secondary: false
+                    card_mod:
+                      style: |
+                        :host([dark-mode]) {
+                          background: rgba(var(--rgb-primary-background-color), 0.2);
+                        } 
+                        :host {
+                          background: rgba(var(--rgb-primary-text-color), 0.025);
+                          --mush-icon-size: 76px;
+                          height: 57px;
+                          margin-left: -18px !important;
+                        }
+                  - type: custom:mushroom-chips-card
+                    chips:
+                      - type: conditional
+                        conditions:
+                          - entity: light.lustra_v_komnate
+                            state: 'on'
+                        chip:
+                          entity: light.lustra_v_komnate
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:ceiling-light
+                      - type: conditional
+                        conditions:
+                          - entity: light.nochnik_v_komnate
+                            state: 'on'
+                        chip:
+                          entity: light.nochnik_v_komnate
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:lamp
+                      - type: conditional
+                        conditions:
+                          - entity: light.bra_v_komnate
+                            state: 'on'
+                        chip:
+                          entity: light.bra_v_komnate
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:wall-sconce
+                      - type: conditional
+                        conditions:
+                          - entity: light.lava_lampa
+                            state: 'on'
+                        chip:
+                          entity: light.lava_lampa
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: lime
+                          icon: mdi:lava-lamp
+                      - type: conditional
+                        conditions:
+                          - entity: switch.10015c681a
+                            state: 'on'
+                        chip:
+                          entity: switch.10015c681a
+                          type: template
+                          icon_color: blue
+                          icon: mdi:desktop-tower
+                          card_mod:
+                            style: |
+                              @keyframes shake {
+                                0%, 100% { transform: translate(0, 0) rotate(0); }
+                                20%  { transform: translate(0.4px, -0.4px) rotate(-4deg); }
+                                40%  { transform: translate(-0.4px, 0.4px) rotate(4deg); }
+                                60%  { transform: translate(0.4px, 0.4px) rotate(-4deg); }
+                                80%  { transform: translate(-0.4px, -0.4px) rotate(4deg); }
+                              }
+                              @keyframes drum {
+                                50%  { clip-path: polygon(0 0, 0 100%, 35% 100%, 34% 68%, 60% 41%, 71% 56%, 65% 74%, 47% 79%, 32% 69%, 35% 100%, 100% 100%, 100% 0); }
+                              }
+                              ha-card {
+                                animation: shake linear infinite;
+                                animation-duration: 1s;
+                              }
+                      - type: conditional
+                        conditions:
+                          - entity: media_player.xboxone
+                            state: 'on'
+                        chip:
+                          entity: media_player.xboxone
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: green
+                          icon: mdi:microsoft-xbox
+                          card_mod:
+                            style: |
+                              @keyframes wave {
+                                50% { transform: rotatey(180deg); --icon-color: rgb(var(--rgb-cyan)); }
+                              }
+                              .shape {
+                                --shape-animation: color 6s ease infinite;
+                              }
+                              @keyframes color {
+                                50% { --shape-color: rgba(var(--rgb-cyan), 0.2); }
+                              }
+                              ha-card {
+                                animation: wave 6s ease infinite;
+                              }
+                      - type: conditional
+                        conditions:
+                          - entity: switch.zariadki_v_komnate
+                            state: 'on'
+                        chip:
+                          entity: switch.zariadki_v_komnate
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: green
+                          icon: mdi:battery-high
+                          card_mod:
+                            style: |
+                              ha-card {
+                                animation: charge 3s steps(1) infinite;
+                              }
+                              @keyframes charge {
+                                0% { clip-path: polygon(0% 0%, 0% 100%, 34% 100%, 34% 24%, 67% 24%, 67% 84%, 34% 84%, 34% 100%, 100% 100%, 100% 0%); }
+                                20% { clip-path: polygon(0% 0%, 0% 100%, 34% 100%, 34% 24%, 67% 24%, 67% 64%, 34% 64%, 34% 100%, 100% 100%, 100% 0%); }
+                                40% { clip-path: polygon(0% 0%, 0% 100%, 34% 100%, 34% 24%, 67% 24%, 67% 44%, 34% 44%, 34% 100%, 100% 100%, 100% 0%); }
+                                60% { clip-path: polygon(0% 0%, 0% 100%, 34% 100%, 34% 24%, 67% 24%, 67% 24%, 34% 24%, 34% 100%, 100% 100%, 100% 0%); }
+                              }
+                    alignment: end
+                    card_mod:
+                      style: |
+                        ha-card {
+                          --chip-box-shadow: none;
+                          --chip-background: none;
+                          --chip-spacing: 0;
+                        } 
+                card_mod:
+                  style: |
+                    ha-card {
+                      height: 91px;
+                      {% if is_state('light.komnata_osveshchenie', 'on') %}
+                        background: rgba(255, 152, 0, 0.1);
+                      {% endif %}
+                    }
+              - type: custom:stack-in-card
+                cards:
+                  - type: custom:mushroom-template-card
+                    primary: Спальня
+                    secondary: 🌡️ {{ states('sensor.climate_termo') | round(0) }} °C
+                    icon: mdi:bed-king
+                    entity: light.spalnia_svet
+                    tap_action:
+                      action: navigate
+                      navigation_path: bedroom
+                    hold_action:
+                      action: toggle
+                    icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
+                    fill_container: true
+                    layout: horizontal
+                    multiline_secondary: false
+                    card_mod:
+                      style: |
+                        :host([dark-mode]) {
+                          background: rgba(var(--rgb-primary-background-color), 0.2);
+                        } 
+                        :host {
+                          background: rgba(var(--rgb-primary-text-color), 0.025);
+                          --mush-icon-size: 76px;
+                          height: 57px;
+                          margin-left: -18px !important;
+                        }
+                  - type: custom:mushroom-chips-card
+                    chips:
+                      - type: conditional
+                        conditions:
+                          - entity: light.spalnia_svet
+                            state: 'on'
+                        chip:
+                          entity: light.spalnia_svet
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:chandelier
+                      - type: conditional
+                        conditions:
+                          - entity: light.nochnik_v_spalne
+                            state: 'on'
+                        chip:
+                          entity: light.nochnik_v_spalne
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:wall-sconce
+                      - type: conditional
+                        conditions:
+                          - entity: light.vykliuchatel_ploshchadka
+                            state: 'on'
+                        chip:
+                          entity: light.vykliuchatel_ploshchadka
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:balcony
+                      - type: conditional
+                        conditions:
+                          - entity: switch.rozetka_v_spalne
+                            state: 'on'
+                        chip:
+                          entity: switch.rozetka_v_spalne
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: red
+                          icon: mdi:iron
+                          card_mod:
+                            style: |
+                              ha-card {
+                                animation: charge 1s linear infinite;
+                              }
+                              @keyframes charge {
+                                0%, 10%, 20%, 30%, 40%, 50%, 60%, 70%, 80%, 90%, 100% { transform: translate(0, 0); }
+                                5% { transform: translate({{ range(-10, 10) | random / 10 }}px, {{ range(-10, 10) | random / 10 }}px); }
+                                15% { transform: translate({{ range(-10, 10) | random / 10 }}px, {{ range(-10, 10) | random / 10 }}px); }
+                                25% { transform: translate({{ range(-10, 10) | random / 10 }}px, {{ range(-10, 10) | random / 10 }}px); }
+                                35% { transform: translate({{ range(-10, 10) | random / 10 }}px, {{ range(-10, 10) | random / 10 }}px); }
+                                45% { transform: translate({{ range(-10, 10) | random / 10 }}px, {{ range(-10, 10) | random / 10 }}px); }
+                                55% { transform: translate({{ range(-10, 10) | random / 10 }}px, {{ range(-10, 10) | random / 10 }}px); }
+                                65% { transform: translate({{ range(-10, 10) | random / 10 }}px, {{ range(-10, 10) | random / 10 }}px); }
+                                75% { transform: translate({{ range(-10, 10) | random / 10 }}px, {{ range(-10, 10) | random / 10 }}px); }
+                                85% { transform: translate({{ range(-10, 10) | random / 10 }}px, {{ range(-10, 10) | random / 10 }}px); }
+                                95% { transform: translate({{ range(-10, 10) | random / 10 }}px, {{ range(-10, 10) | random / 10 }}px); }
+                              }
+                      - type: conditional
+                        conditions:
+                          - entity: binary_sensor.dd_ploshchadka_occupancy
+                            state: 'on'
+                        chip:
+                          type: template
+                          icon_color: green
+                          icon: mdi:motion-sensor
+                    alignment: end
+                    card_mod:
+                      style: |
+                        ha-card {
+                          --chip-box-shadow: none;
+                          --chip-background: none;
+                          --chip-spacing: 0;
+                        } 
+                card_mod:
+                  style: |
+                    ha-card {
+                      height: 91px;
+                      {% if is_state('light.spalnia_svet', 'on') %}
+                        background: rgba(255, 152, 0, 0.1);
+                      {% endif %}
+                    }
+          - type: horizontal-stack
+            cards:
+              - type: custom:stack-in-card
+                cards:
+                  - type: custom:mushroom-template-card
+                    primary: Кухня
+                    secondary: 🌡️ {{ states('sensor.climate_termo') | round(0) }} °C
+                    icon: mdi:silverware-fork-knife
+                    entity: light.kukhnia_gruppa
+                    tap_action:
+                      action: navigate
+                      navigation_path: kitchen
+                    hold_action:
+                      action: toggle
+                    icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
+                    fill_container: true
+                    layout: horizontal
+                    multiline_secondary: true
+                    card_mod:
+                      style: |
+                        :host([dark-mode]) {
+                          background: rgba(var(--rgb-primary-background-color), 0.2);
+                        } 
+                        :host {
+                          background: rgba(var(--rgb-primary-text-color), 0.025);
+                          --mush-icon-size: 76px;
+                          height: 57px;
+                          margin-left: -18px !important;
+                        }
+                  - type: custom:mushroom-chips-card
+                    chips:
+                      - type: conditional
+                        conditions:
+                          - entity: binary_sensor.datchik_utechki_vody_water_leak
+                            state: 'on'
+                        chip:
+                          type: template
+                          icon_color: light-blue
+                          icon: mdi:water-alert
+                          tap_action:
+                            action: more-info
+                          entity: binary_sensor.datchik_utechki_vody_water_leak
+                          card_mod:
+                            style: |
+                              ha-card {
+                                animation: blink 1s linear infinite;
+                              }
+                              @keyframes blink {
+                                50% {opacity: 0;}
+                              }  
+                      - type: conditional
+                        conditions:
+                          - entity: binary_sensor.datchik_utechki_gaza_gas
+                            state: 'on'
+                        chip:
+                          type: template
+                          icon_color: red
+                          icon: mdi:fire-alert
+                          tap_action:
+                            action: more-info
+                          entity: binary_sensor.datchik_utechki_gaza_gas
+                          card_mod:
+                            style: |
+                              ha-card {
+                                animation: blink 1s linear infinite;
+                              }
+                              @keyframes blink {
+                                50% {opacity: 0;}
+                              }  
+                      - type: conditional
+                        conditions:
+                          - entity: light.svetilnik_na_kukhne
+                            state: 'on'
+                        chip:
+                          entity: light.svetilnik_na_kukhne
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:ceiling-light
+                      - type: conditional
+                        conditions:
+                          - entity: light.podsvetka_na_kukhne
+                            state: 'on'
+                        chip:
+                          entity: light.podsvetka_na_kukhne
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:countertop
+                      - type: conditional
+                        conditions:
+                          - entity: input_boolean.chainik
+                            state: 'on'
+                        chip:
+                          entity: input_boolean.chainik
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: blue
+                          icon: mdi:kettle-steam
+                          card_mod:
+                            style: |
+                              @keyframes boil {
+                                0%, 100% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
+                                10% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); clip-path: polygon(0 0, 66% 10%, 67% 30%, 88% 52%, 100% 100%, 0 100%); }
+                                20% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
+                                30% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
+                                40% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
+                                50% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
+                                60% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
+                                70% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
+                                80% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
+                                90% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
+                              }
+                              ha-card {
+                                animation: boil linear infinite;
+                                animation-duration: 500ms;
+                              }
+                      - type: conditional
+                        conditions:
+                          - entity: switch.multivarka_rozetka
+                            state: 'on'
+                        chip:
+                          entity: switch.multivarka_rozetka
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: blue
+                          icon: mdi:pot-steam
+                          card_mod:
+                            style: |
+                              @keyframes steam {
+                                0%, 100% { clip-path: inset(0 0 0 0); }
+                                50% { clip-path: inset(39% 0 0 0); }
+                              }
+                              ha-card {
+                                animation: steam linear infinite;
+                                animation-duration: 2s;
+                              }
+                      - type: conditional
+                        conditions:
+                          - entity: switch.kofevarka
+                            state: 'on'
+                        chip:
+                          entity: switch.kofevarka
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: blue
+                          icon: mdi:coffee-maker
+                          card_mod:
+                            style: |
+                              @keyframes java {
+                                0%, 80%, 100% { clip-path: polygon(0 0, 100% 0, 100% 32%, 47% 32%, 47% 43%, 100% 43%, 100% 100%, 0 100%); }
+                                10% { clip-path: polygon(0 0, 100% 0, 100% 32%, 47% 32%, 47% 43%, 100% 43%, 100% 100%, 55% 100%, 55% 79%, 63% 76%, 67% 70%, 66% 54%, 42% 55%, 42% 70%, 47% 77%, 55% 80%, 57% 100%, 0 100%); }
+                                15% { clip-path: polygon(0 0, 100% 0, 100% 100%, 55% 100%, 55% 79%, 63% 76%, 67% 70%, 66% 54%, 42% 54%, 42% 70%, 47% 77%, 55% 80%, 55% 100%, 0 100%); }
+                                20% { clip-path: polygon(0 0, 100% 0, 100% 32%, 47% 32%, 47% 43%, 100% 43%, 100% 100%, 55% 100%, 55% 76%, 63% 76%, 67% 70%, 66% 54%, 42% 55%, 42% 70%, 47% 76%, 55% 76%, 57% 100%, 0 100%); }
+                                25% { clip-path: polygon(0 0, 100% 0, 100% 100%, 55% 100%, 55% 76%, 63% 76%, 67% 70%, 66% 54%, 42% 54%, 42% 70%, 47% 76%, 55% 76%, 56% 100%, 0 100%); }
+                                30% { clip-path: polygon(0 0, 100% 0, 100% 32%, 47% 32%, 47% 43%, 100% 43%, 100% 100%, 55% 100%, 55% 73%, 64% 73%, 66% 70%, 66% 55%, 42% 55%, 42% 69%, 44% 73%, 55% 73%, 57% 100%, 0 100%); }
+                                35% { clip-path: polygon(0 0, 100% 0, 100% 100%, 55% 100%, 55% 73%, 64% 73%, 66% 70%, 66% 55%, 42% 54%, 42% 69%, 44% 73%, 55% 73%, 56% 100%, 0 100%); }
+                                40% { clip-path: polygon(0 0, 100% 0, 100% 32%, 47% 32%, 47% 43%, 100% 43%, 100% 100%, 55% 100%, 55% 70%, 67% 70%, 66% 54%, 42% 54%, 42% 70%, 57% 70%, 57% 100%, 0 100%); }
+                                45% { clip-path: polygon(0 0, 100% 0, 100% 100%, 55% 100%, 55% 70%, 67% 70%, 66% 54%, 42% 54%, 42% 70%, 55% 70%, 56% 100%, 0 100%); }
+                                50% { clip-path: polygon(0 0, 100% 0, 100% 32%, 47% 32%, 47% 43%, 100% 43%, 100% 100%, 55% 100%, 55% 66%, 67% 65%, 66% 54%, 42% 54%, 42% 65%, 57% 65%, 57% 100%, 0 100%); }
+                                55% { clip-path: polygon(0 0, 100% 0, 100% 100%, 55% 100%, 55% 66%, 67% 65%, 66% 54%, 42% 54%, 42% 65%, 55% 65%, 56% 100%, 0 100%); }
+                                60% { clip-path: polygon(0 0, 100% 0, 100% 32%, 47% 32%, 47% 43%, 100% 43%, 100% 100%, 55% 100%, 55% 60%, 66% 60%, 66% 54%, 42% 54%, 42% 60%, 57% 60%, 57% 100%, 0 100%); }
+                                65% { clip-path: polygon(0 0, 100% 0, 100% 100%, 55% 100%, 55% 60%, 66% 60%, 66% 54%, 42% 54%, 42% 60%, 55% 60%, 56% 100%, 0 100%); }
+                                70% { clip-path: polygon(0 0, 100% 0, 100% 32%, 47% 32%, 47% 43%, 100% 43%, 100% 100%, 55% 100%, 55% 56%, 66% 56%, 66% 54%, 42% 54%, 42% 56%, 57% 56%, 57% 100%, 0 100%); }
+                                75% { clip-path: polygon(0 0, 100% 0, 100% 100%, 55% 100%, 55% 56%, 66% 56%, 66% 54%, 42% 54%, 42% 56%, 55% 56%, 55% 100%, 0 100%); }
+                              }
+                              ha-card {
+                                animation: java 4s linear infinite;
+                              }
+                      - type: conditional
+                        conditions:
+                          - entity: switch.posudomoika
+                            state: 'on'
+                        chip:
+                          entity: switch.posudomoika
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: blue
+                          icon: mdi:dishwasher
+                          card_mod:
+                            style: |
+                              @keyframes shake {
+                                0%, 100% { transform: translate(0, 0) rotate(0); }
+                                20%  { transform: translate(0.4px, -0.4px) rotate(-4deg); }
+                                40%  { transform: translate(-0.4px, 0.4px) rotate(4deg); }
+                                60%  { transform: translate(0.4px, 0.4px) rotate(-4deg); }
+                                80%  { transform: translate(-0.4px, -0.4px) rotate(4deg); }
+                              }
+                              @keyframes drum {
+                                50%  { clip-path: polygon(0 0, 0 100%, 35% 100%, 34% 68%, 60% 41%, 71% 56%, 65% 74%, 47% 79%, 32% 69%, 35% 100%, 100% 100%, 100% 0); }
+                              }
+                              ha-card {
+                                animation: shake linear infinite;
+                                animation-duration: 2s;
+                              }
+                      - type: conditional
+                        conditions:
+                          - entity: binary_sensor.dd_kukhnia_occupancy
+                            state: 'on'
+                        chip:
+                          entity: binary_sensor.dd_kukhnia_occupancy
+                          type: template
+                          icon_color: green
+                          icon: mdi:motion-sensor
+                    alignment: end
+                    card_mod:
+                      style: |
+                        ha-card {
+                          --chip-box-shadow: none;
+                          --chip-background: none;
+                          --chip-spacing: 0;
+                        } 
+                card_mod:
+                  style: |
+                    ha-card {
+                      height: 91px;
+                      {% if is_state('light.kukhnia_gruppa', 'on') %}
+                        background: rgba(255, 152, 0, 0.1);
+                      {% endif %}
+                    }
+              - type: custom:stack-in-card
+                cards:
+                  - type: custom:mushroom-template-card
+                    primary: Туалет
+                    secondary: 🌡️ {{ states('sensor.temperatura') | round(0) }} °C
+                    icon: mdi:toilet
+                    entity: light.tualet_osveshchenie
+                    tap_action:
+                      action: navigate
+                      navigation_path: toilet
+                    hold_action:
+                      action: toggle
+                    icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
+                    fill_container: true
+                    layout: horizontal
+                    multiline_secondary: false
+                    card_mod:
+                      style: |
+                        :host([dark-mode]) {
+                          background: rgba(var(--rgb-primary-background-color), 0.2);
+                        } 
+                        :host {
+                          background: rgba(var(--rgb-primary-text-color), 0.025);
+                          --mush-icon-size: 76px;
+                          height: 57px;
+                          margin-left: -18px !important;
+                        }
+                  - type: custom:mushroom-chips-card
+                    chips:
+                      - type: conditional
+                        conditions:
+                          - entity: light.svetilnik_v_tualete
+                            state: 'on'
+                        chip:
+                          entity: light.svetilnik_v_tualete
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:ceiling-light
+                      - type: conditional
+                        conditions:
+                          - entity: light.controller_dimmable_6edba1
+                            state: 'on'
+                        chip:
+                          entity: light.controller_dimmable_6edba1
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:toilet
+                      - type: conditional
+                        conditions:
+                          - entity: light.svetilnik_v_garderobe
+                            state: 'on'
+                        chip:
+                          entity: light.svetilnik_v_garderobe
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:hanger
+                      - type: conditional
+                        conditions:
+                          - entity: switch.rele_tualet
+                            state: 'on'
+                        chip:
+                          entity: switch.rele_tualet
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: blue
+                          icon: mdi:fan
+                          card_mod:
+                            style: |
+                              @keyframes rotation {
+                                0% {
+                                  transform: rotate(0deg);
+                                }
+                                100% {
+                                  transform: rotate(360deg);
+                                }
+                              }
+                              ha-card {
+                                animation: rotation linear infinite;
+                                animation-duration: 2s;
+                              }
+                      - type: conditional
+                        conditions:
+                          - entity: binary_sensor.dd_tualet_occupancy
+                            state: 'on'
+                        chip:
+                          type: template
+                          icon_color: green
+                          icon: mdi:motion-sensor
+                    alignment: end
+                    card_mod:
+                      style: |
+                        ha-card {
+                          --chip-box-shadow: none;
+                          --chip-background: none;
+                          --chip-spacing: 0;
+                        } 
+                card_mod:
+                  style: |
+                    ha-card {
+                      height: 91px;
+                      {% if is_state('light.tualet_osveshchenie', 'on') %}
+                        background: rgba(255, 152, 0, 0.1);
+                      {% endif %}
+                    }
+          - type: horizontal-stack
+            cards:
+              - type: custom:stack-in-card
+                cards:
+                  - type: custom:mushroom-template-card
+                    primary: Ванная
+                    secondary: 🌡️ {{ states('sensor.dtv_temperature') | round(0) }} °C
+                    icon: mdi:bathtub
+                    entity: light.vannaia_svet
+                    tap_action:
+                      action: navigate
+                      navigation_path: bath
+                    hold_action:
+                      action: toggle
+                    icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
+                    fill_container: true
+                    layout: horizontal
+                    multiline_secondary: false
+                    card_mod:
+                      style: |
+                        :host([dark-mode]) {
+                          background: rgba(var(--rgb-primary-background-color), 0.2);
+                        } 
+                        :host {
+                          background: rgba(var(--rgb-primary-text-color), 0.025);
+                          --mush-icon-size: 76px;
+                          height: 57px;
+                          margin-left: -18px !important;
+                        }
+                  - type: custom:mushroom-chips-card
+                    chips:
+                      - type: conditional
+                        conditions:
+                          - entity: light.vannaia_svet
+                            state: 'on'
+                        chip:
+                          entity: light.vannaia_svet
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:ceiling-light
+                      - type: conditional
+                        conditions:
+                          - entity: binary_sensor.dd_vannaia_occupancy
+                            state: 'on'
+                        chip:
+                          entity: binary_sensor.dd_vannaia_occupancy
+                          type: template
+                          icon_color: green
+                          icon: mdi:motion-sensor
+                    alignment: end
+                    card_mod:
+                      style: |
+                        ha-card {
+                          --chip-box-shadow: none;
+                          --chip-background: none;
+                          --chip-spacing: 0;
+                        } 
+                card_mod:
+                  style: |
+                    ha-card {
+                      height: 91px;
+                      {% if is_state('light.vannaia_svet', 'on') %}
+                        background: rgba(255, 152, 0, 0.1);
+                      {% endif %}
+                    }
+              - type: custom:stack-in-card
+                cards:
+                  - type: custom:mushroom-template-card
+                    primary: Прихожая
+                    secondary: 🌡️ {{ states('sensor.dtv_temperature') | round(0) }} °C
+                    icon: mdi:shoe-print
+                    entity: light.prikhozhaia_osveshchenie
+                    tap_action:
+                      action: navigate
+                      navigation_path: hall
+                    hold_action:
+                      action: toggle
+                    icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
+                    fill_container: true
+                    layout: horizontal
+                    multiline_secondary: false
+                    card_mod:
+                      style: |
+                        :host([dark-mode]) {
+                          background: rgba(var(--rgb-primary-background-color), 0.2);
+                        } 
+                        :host {
+                          background: rgba(var(--rgb-primary-text-color), 0.025);
+                          --mush-icon-size: 76px;
+                          height: 57px;
+                          margin-left: -18px !important;
+                        }
+                  - type: custom:mushroom-chips-card
+                    chips:
+                      - type: conditional
+                        conditions:
+                          - entity: light.scet_v_prihozhei
+                            state: 'on'
+                        chip:
+                          entity: light.scet_v_prihozhei
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:ceiling-light
+                      - type: conditional
+                        conditions:
+                          - entity: light.nochnik_v_prikhozhei
+                            state: 'on'
+                        chip:
+                          entity: light.nochnik_v_prikhozhei
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:wall-sconce
+                      - type: conditional
+                        conditions:
+                          - entity: light.svet_na_lestnice
+                            state: 'on'
+                        chip:
+                          entity: light.svet_na_lestnice
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:stairs-up
+                      - type: conditional
+                        conditions:
+                          - entity: light.svet_v_chulane
+                            state: 'on'
+                        chip:
+                          entity: light.svet_v_chulane
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:lightbulb-on
+                      - type: conditional
+                        conditions:
+                          - entity: light.svet_v_koridore
+                            state: 'on'
+                        chip:
+                          entity: light.svet_v_koridore
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:door
+                          card_mod:
+                            style: |
+                              ha-card {
+                                animation: open 6s ease-in-out infinite;
+                                transform-origin: 30%;
+                              }
+                              @keyframes open {
+                                0%, 66% { transform: rotateY(0deg); }
+                                33% { transform: rotateY(-120deg); }
+                              }
+                              .shape {
+                                perspective: 45px;
+                              }
+                      - type: conditional
+                        conditions:
+                          - entity: binary_sensor.dd_prikhozhaia_occupancy
+                            state: 'on'
+                        chip:
+                          type: template
+                          icon_color: green
+                          icon: mdi:motion-sensor
+                    alignment: end
+                    card_mod:
+                      style: |
+                        ha-card {
+                          --chip-box-shadow: none;
+                          --chip-background: none;
+                          --chip-spacing: 0;
+                        } 
+                card_mod:
+                  style: |
+                    ha-card {
+                      height: 91px;
+                      {% if is_state('light.prikhozhaia_osveshchenie', 'on') %}
+                        background: rgba(255, 152, 0, 0.1);
+                      {% endif %}
+                    }
+          - type: horizontal-stack
+            cards:
+              - type: custom:stack-in-card
+                cards:
+                  - type: custom:mushroom-template-card
+                    primary: Зал
+                    secondary: 🌡️ {{ states('sensor.climate_termo') | round(0) }} °C
+                    icon: mdi:chandelier
+                    entity: light.zal_osveshchenie
+                    tap_action:
+                      action: navigate
+                      navigation_path: living
+                    hold_action:
+                      action: toggle
+                    icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
+                    fill_container: true
+                    layout: horizontal
+                    multiline_secondary: false
+                    card_mod:
+                      style: |
+                        :host([dark-mode]) {
+                          background: rgba(var(--rgb-primary-background-color), 0.2);
+                        } 
+                        :host {
+                          background: rgba(var(--rgb-primary-text-color), 0.025);
+                          --mush-icon-size: 76px;
+                          height: 57px;
+                          margin-left: -18px !important;
+                        }
+                  - type: custom:mushroom-chips-card
+                    chips:
+                      - type: conditional
+                        conditions:
+                          - entity: light.zal_osveshchenie
+                            state: 'on'
+                        chip:
+                          entity: light.zal_osveshchenie
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:chandelier
+                      - type: conditional
+                        conditions:
+                          - entity: switch.rozetka_zal
+                            state: 'on'
+                        chip:
+                          entity: switch.rozetka_zal
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: blue
+                          icon: mdi:power-socket-de
+                    alignment: end
+                    card_mod:
+                      style: |
+                        ha-card {
+                          --chip-box-shadow: none;
+                          --chip-background: none;
+                          --chip-spacing: 0;
+                        } 
+                card_mod:
+                  style: |
+                    ha-card {
+                      height: 91px;
+                      {% if is_state('light.zal_osveshchenie', 'on') %}
+                        background: rgba(255, 152, 0, 0.1);
+                      {% endif %}
+                    }
+              - type: custom:stack-in-card
+                cards:
+                  - type: custom:mushroom-template-card
+                    primary: Детская
+                    secondary: 🌡️ {{ states('sensor.climate_termo') | round(0) }} °C
+                    icon: mdi:teddy-bear
+                    entity: light.detskaia
+                    tap_action:
+                      action: navigate
+                      navigation_path: children
+                    hold_action:
+                      action: toggle
+                    icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
+                    fill_container: true
+                    layout: horizontal
+                    multiline_secondary: false
+                    card_mod:
+                      style: |
+                        :host([dark-mode]) {
+                          background: rgba(var(--rgb-primary-background-color), 0.2);
+                        } 
+                        :host {
+                          background: rgba(var(--rgb-primary-text-color), 0.025);
+                          --mush-icon-size: 76px;
+                          height: 57px;
+                          margin-left: -18px !important;
+                        }
+                  - type: custom:mushroom-chips-card
+                    chips:
+                      - type: conditional
+                        conditions:
+                          - entity: light.svet_v_detskoi
+                            state: 'on'
+                        chip:
+                          entity: light.svet_v_detskoi
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:chandelier
+                      - type: conditional
+                        conditions:
+                          - entity: light.nochnik_v_detskoi
+                            state: 'on'
+                        chip:
+                          entity: light.nochnik_v_detskoi
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:wall-sconce
+                      - type: conditional
+                        conditions:
+                          - entity: binary_sensor.dd_detskaia_occupancy
+                            state: 'on'
+                        chip:
+                          type: template
+                          icon_color: green
+                          icon: mdi:motion-sensor
+                    alignment: end
+                    card_mod:
+                      style: |
+                        ha-card {
+                          --chip-box-shadow: none;
+                          --chip-background: none;
+                          --chip-spacing: 0;
+                        } 
+                card_mod:
+                  style: |
+                    ha-card {
+                      height: 91px;
+                      {% if is_state('light.detskaia', 'on') %}
+                        background: rgba(255, 152, 0, 0.1);
+                      {% endif %}
+                    }
+          - type: horizontal-stack
+            cards:
+              - type: custom:stack-in-card
+                cards:
+                  - type: custom:mushroom-template-card
+                    primary: Баня
+                    secondary: >-
+                      🌡️ {{ states('sensor.banya_temperature_2') | round(0) }}
+                      °C
+                    icon: mdi:home-thermometer
+                    entity: switch.bania
+                    tap_action:
+                      action: navigate
+                      navigation_path: sauna
+                    hold_action:
+                      action: toggle
+                    icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
+                    fill_container: true
+                    layout: horizontal
+                    multiline_secondary: false
+                    card_mod:
+                      style: |
+                        :host([dark-mode]) {
+                          background: rgba(var(--rgb-primary-background-color), 0.2);
+                        } 
+                        :host {
+                          background: rgba(var(--rgb-primary-text-color), 0.025);
+                          --mush-icon-size: 76px;
+                          height: 57px;
+                          margin-left: -18px !important;
+                        }
+                  - type: custom:mushroom-chips-card
+                    chips:
+                      - type: conditional
+                        conditions:
+                          - entity: switch.bania
+                            state: 'on'
+                        chip:
+                          entity: switch.bania
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:flash
+                      - type: conditional
+                        conditions:
+                          - entity: light.banya
+                            state: 'on'
+                        chip:
+                          entity: light.banya
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:lightbulb-on
+                          card_mod:
+                            style: |
+                              ha-card {
+                                animation: eureka 1.8s infinite;
+                              }
+                              @keyframes eureka {
+                                0%, 45%, 55%, 100% { transform: translateY(0) scale(1); clip-path: polygon(20% 100%, 21% 38%, 36% 22%, 62% 21%, 79% 37%, 80% 100%, 53% 100%, 55% 67%, 62% 62%, 66% 55%, 67% 46%, 62% 38%, 55% 34%, 47% 34%, 39% 37%, 34% 44%, 33% 53%, 36% 60%, 41% 64%, 45% 66%, 45% 76%, 56% 76%, 54% 100%); }
+                                10%, 40% { transform: translateY(-5px) scale(1.12); clip-path: inset(0 0 0 0); }
+                                50% { transform: translateY(-2px) }
+                              }
+                      - type: conditional
+                        conditions:
+                          - entity: switch.voda_v_baniu
+                            state: 'on'
+                        chip:
+                          entity: switch.voda_v_baniu
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: blue
+                          icon: mdi:water-pump
+                          card_mod:
+                            style: |
+                              ha-card {
+                                animation: drip 2s infinite; 
+                              }
+                              @keyframes drip {
+                                0%, 100% { clip-path: inset(0 0 0 0); }
+                                15%, 85% { clip-path: polygon(0 0, 100% 0, 100% 57%, 64% 57%, 64% 100%, 0 100%); }
+                              }
+                    alignment: end
+                    card_mod:
+                      style: |
+                        ha-card {
+                          --chip-box-shadow: none;
+                          --chip-background: none;
+                          --chip-spacing: 0;
+                        } 
+                card_mod:
+                  style: |
+                    ha-card {
+                      height: 91px;
+                      {% if is_state('switch.bania', 'on') %}
+                        background: rgba(255, 152, 0, 0.1);
+                      {% endif %}
+                    }
+              - type: custom:stack-in-card
+                cards:
+                  - type: custom:mushroom-template-card
+                    primary: Беседка
+                    secondary: >
+                      {{ 
+
+                      "🌡️ " ~ state_attr('weather.dom', 'temperature') |
+                      round(0) ~ " °C" 
+
+                      if is_state("sensor.temperatura_besedka", "unavailable") 
+
+                      else 
+
+                      "🌡️ " ~ states("sensor.temperatura_besedka") | round(0) ~
+                      " °C" 
+
+                      }}
+                    icon: mdi:greenhouse
+                    entity: switch.besedka
+                    tap_action:
+                      action: navigate
+                      navigation_path: alcove
+                    hold_action:
+                      action: toggle
+                    icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
+                    fill_container: true
+                    layout: horizontal
+                    multiline_secondary: false
+                    card_mod:
+                      style: |
+                        :host([dark-mode]) {
+                          background: rgba(var(--rgb-primary-background-color), 0.2);
+                        } 
+                        :host {
+                          background: rgba(var(--rgb-primary-text-color), 0.025);
+                          --mush-icon-size: 76px;
+                          height: 57px;
+                          margin-left: -18px !important;
+                        }
+                  - type: custom:mushroom-chips-card
+                    chips:
+                      - type: conditional
+                        conditions:
+                          - entity: switch.besedka
+                            state: 'on'
+                        chip:
+                          entity: switch.besedka
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:flash
+                          card_mod:
+                            style: |
+                              ha-card {
+                                animation: flash 4s linear infinite;
+                              }
+                              @keyframes flash {
+                                0%, 4%, 8%, 12%, 16%, 20%, 24%, 28%, 32%, 100% { transform: translate(0px,0px); }
+                                2% { transform: translate(-0.3px, 0px); }
+                                6% { transform: translate(0.3px, 0px); }
+                                10% { transform: translate(-0.2px, 0px); }
+                                14% { transform: translate(0.2px, 0px); }
+                                18% { transform: translate(-0.2px, 0px); }
+                                22% { transform: translate(0.5px, 0px); }
+                                26% { transform: translate(-0.5px, 0px); }
+                                34% { transform: translate(-1px, 5px); --icon-color: rgb(var(--rgb-amber)); }
+                                38% { transform: translate(0px, 0px); --icon-color: rgb(var(--rgb-white)); }
+                                40% { --icon-color: rgb(var(--rgb-amber)); }
+                              }
+                      - type: conditional
+                        conditions:
+                          - entity: light.besedka
+                            state: 'on'
+                        chip:
+                          entity: light.besedka
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:lightbulb-on
+                          card_mod:
+                            style: |
+                              ha-card {
+                                animation: eureka 1.8s infinite;
+                              }
+                              @keyframes eureka {
+                                0%, 45%, 55%, 100% { transform: translateY(0) scale(1); clip-path: polygon(20% 100%, 21% 38%, 36% 22%, 62% 21%, 79% 37%, 80% 100%, 53% 100%, 55% 67%, 62% 62%, 66% 55%, 67% 46%, 62% 38%, 55% 34%, 47% 34%, 39% 37%, 34% 44%, 33% 53%, 36% 60%, 41% 64%, 45% 66%, 45% 76%, 56% 76%, 54% 100%); }
+                                10%, 40% { transform: translateY(-5px) scale(1.12); clip-path: inset(0 0 0 0); }
+                                50% { transform: translateY(-2px) }
+                              }
+                      - type: conditional
+                        conditions:
+                          - entity: light.svet_v_besedke
+                            state: 'on'
+                        chip:
+                          entity: light.svet_v_besedke
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: amber
+                          icon: mdi:ceiling-light
+                      - type: conditional
+                        conditions:
+                          - entity: switch.samovar
+                            state: 'on'
+                        chip:
+                          entity: switch.samovar
+                          tap_action:
+                            action: toggle
+                          type: template
+                          icon_color: blue
+                          icon: mdi:kettle-steam
+                          card_mod:
+                            style: |
+                              @keyframes boil {
+                                0%, 100% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
+                                10% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); clip-path: polygon(0 0, 66% 10%, 67% 30%, 88% 52%, 100% 100%, 0 100%); }
+                                20% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
+                                30% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
+                                40% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
+                                50% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
+                                60% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
+                                70% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
+                                80% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
+                                90% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
+                              }
+                              ha-card {
+                                animation: boil linear infinite;
+                                animation-duration: 500ms;
+                              }
+                    alignment: end
+                    card_mod:
+                      style: |
+                        ha-card {
+                          --chip-box-shadow: none;
+                          --chip-background: none;
+                          --chip-spacing: 0;
+                        } 
+                card_mod:
+                  style: |
+                    ha-card {
+                      height: 91px;
+                      {% if is_state('switch.besedka', 'on') %}
+                        background: rgba(255, 152, 0, 0.1);
+                      {% endif %}
+                    }
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-template-card
+            primary: Камеры
+            icon: mdi:cctv
+            icon_color: white
+            card_mod:
+              style: |
+                ha-card {
+                  background: rgba(var(--rgb-card-background-color), 0.7) url( '/local/images/cameras.jpg' ) center no-repeat;
+                  background-size: cover;
+                  background-blend-mode: overlay;
+                }
+          - type: custom:tabbed-card
+            tabs:
+              - card:
+                  type: picture-elements
+                  camera_view: auto
+                  camera_image: camera.vkhod_mainstream_2
+                  elements:
+                    - type: icon
+                      icon: mdi:arrow-expand-all
+                      tap_action:
+                        action: more-info
+                      entity: camera.vkhod_mainstream_2
+                      style:
+                        bottom: 7%
+                        right: 5%
+                        color: white
+                        opacity: 0.5
+                        transform: scale(1.5, 1.5)
+                attributes:
+                  label: Вход
+              - card:
+                  type: picture-elements
+                  camera_view: auto
+                  camera_image: camera.dvor_mainstream_2
+                  elements:
+                    - type: icon
+                      icon: mdi:arrow-expand-all
+                      tap_action:
+                        action: more-info
+                      entity: camera.dvor_mainstream_2
+                      style:
+                        bottom: 7%
+                        right: 5%
+                        color: white
+                        opacity: 0.5
+                        transform: scale(1.5, 1.5)
+                attributes:
+                  label: Двор
+              - card:
+                  type: picture-elements
+                  camera_view: auto
+                  camera_image: camera.kitchen
+                  elements:
+                    - type: icon
+                      icon: mdi:arrow-expand-all
+                      tap_action:
+                        action: more-info
+                      entity: camera.kitchen
+                      style:
+                        bottom: 7%
+                        right: 5%
+                        color: white
+                        opacity: 0.5
+                        transform: scale(1.5, 1.5)
+                attributes:
+                  label: Кухня
       - type: horizontal-stack
         cards:
-          - type: custom:stack-in-card
+          - type: custom:flower-card
+            entity: plant.teplitsa
+            show_bars:
+              - temperature
+              - humidity
+              - moisture
+              - brigthness
+  - subview: true
+    title: Включенные устройства
+    path: info
+    icon: mdi:lightbulb-on
+    layout:
+      view_layout:
+        column: 10
+    badges: []
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: custom:auto-entities
+            show_empty: false
+            card:
+              type: entities
+              title: Свет
+              state_color: true
+            filter:
+              include:
+                - group: light.osveshchenie
+                  state: 'on'
+                  options:
+                    secondary_info: last-changed
+                    tap_action:
+                      action: toggle
+            sort:
+              method: last_changed
+              reverse: true
+      - type: horizontal-stack
+        cards:
+          - type: custom:auto-entities
+            show_empty: false
+            card:
+              type: entities
+              title: Устройства
+              show_header_toggle: false
+              state_color: true
+            filter:
+              include:
+                - group: switch.ustroistva
+                  state: 'on'
+                  options:
+                    secondary_info: last-changed
+                    tap_action:
+                      action: toggle
+            sort:
+              method: last_changed
+              reverse: true
+  - title: Комната
+    path: room
+    icon: mdi:laptop
+    badges: []
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: back
+              - type: entity
+                entity: button.scroot_pc_multiplekeys
+                icon_color: lime
+                icon: mdi:keyboard
+                tap_action:
+                  action: toggle
+                content_info: none
+              - type: entity
+                entity: input_boolean.monitor
+                icon_color: blue
+                icon: mdi:monitor
+                tap_action:
+                  action: toggle
+                content_info: none
+              - type: entity
+                entity: media_player.hitv
+                name: ТВ
+                content_info: none
+                tap_action:
+                  action: toggle
+                icon: mdi:television-classic
+                icon_color: amber
+              - type: entity
+                entity: switch.zariadki_v_komnate
+                name: Зарядка
+                content_info: none
+                tap_action:
+                  action: toggle
+                icon: mdi:battery-high
+                icon_color: green
+                card_mod:
+                  style: |
+                    ha-card {
+                    {% if is_state('switch.zariadki_v_komnate', 'on') %}
+                      animation: charge 3s steps(1) infinite;
+                    {% endif %}
+                    }
+                    @keyframes charge {
+                      0% { clip-path: polygon(0% 0%, 0% 100%, 34% 100%, 34% 24%, 67% 24%, 67% 84%, 34% 84%, 34% 100%, 100% 100%, 100% 0%); }
+                      20% { clip-path: polygon(0% 0%, 0% 100%, 34% 100%, 34% 24%, 67% 24%, 67% 64%, 34% 64%, 34% 100%, 100% 100%, 100% 0%); }
+                      40% { clip-path: polygon(0% 0%, 0% 100%, 34% 100%, 34% 24%, 67% 24%, 67% 44%, 34% 44%, 34% 100%, 100% 100%, 100% 0%); }
+                      60% { clip-path: polygon(0% 0%, 0% 100%, 34% 100%, 34% 24%, 67% 24%, 67% 24%, 34% 24%, 34% 100%, 100% 100%, 100% 0%); }
+                    }
+      - type: custom:layout-card
+        layout_type: custom:vertical-layout
+        layout: {}
+        cards:
+          - type: horizontal-stack
             cards:
               - type: custom:mushroom-template-card
                 primary: Комната
-                secondary: '🌡️ {{ states(''sensor.climate_termo'') | round(0) }} °C'
                 icon: mdi:laptop
-                entity: light.komnata_osveshchenie
-                tap_action:
-                  action: navigate
-                  navigation_path: room
-                hold_action:
-                  action: toggle
-                icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
-                fill_container: true
-                layout: horizontal
-                multiline_secondary: false
-                card_mod:
-                  style: |
-                    :host([dark-mode]) {
-                      background: rgba(var(--rgb-primary-background-color), 0.2);
-                    } 
-                    :host {
-                      background: rgba(var(--rgb-primary-text-color), 0.025);
-                      --mush-icon-size: 76px;
-                      height: 66px;
-                      margin-left: -18px !important;
-                    }
-              - type: custom:mushroom-chips-card
-                chips:
-                  - type: conditional
-                    conditions:
-                      - entity: light.lustra_v_komnate
-                        state: 'on'
-                    chip:
-                      entity: light.lustra_v_komnate
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:ceiling-light
-                  - type: conditional
-                    conditions:
-                      - entity: light.nochnik_v_komnate
-                        state: 'on'
-                    chip:
-                      entity: light.nochnik_v_komnate
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:lamp
-                  - type: conditional
-                    conditions:
-                      - entity: light.bra_v_komnate
-                        state: 'on'
-                    chip:
-                      entity: light.bra_v_komnate
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:wall-sconce
-                  - type: conditional
-                    conditions:
-                      - entity: light.lava_lampa
-                        state: 'on'
-                    chip:
-                      entity: light.lava_lampa
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: lime
-                      icon: mdi:lava-lamp
-                  - type: conditional
-                    conditions:
-                      - entity: switch.10015c681a
-                        state: 'on'
-                    chip:
-                      entity: switch.10015c681a
-                      type: template
-                      icon_color: blue
-                      icon: mdi:desktop-tower
-                      card_mod:
-                        style: |
-                          @keyframes shake {
-                            0%, 100% { transform: translate(0, 0) rotate(0); }
-                            20%  { transform: translate(0.4px, -0.4px) rotate(-4deg); }
-                            40%  { transform: translate(-0.4px, 0.4px) rotate(4deg); }
-                            60%  { transform: translate(0.4px, 0.4px) rotate(-4deg); }
-                            80%  { transform: translate(-0.4px, -0.4px) rotate(4deg); }
-                          }
-                          @keyframes drum {
-                            50%  { clip-path: polygon(0 0, 0 100%, 35% 100%, 34% 68%, 60% 41%, 71% 56%, 65% 74%, 47% 79%, 32% 69%, 35% 100%, 100% 100%, 100% 0); }
-                          }
-                          ha-card {
-                            animation: shake linear infinite;
-                            animation-duration: 1s;
-                          }
-                  - type: conditional
-                    conditions:
-                      - entity: media_player.xboxone
-                        state: 'on'
-                    chip:
-                      entity: media_player.xboxone
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: green
-                      icon: mdi:microsoft-xbox
-                      card_mod:
-                        style: |
-                          @keyframes wave {
-                            50% { transform: rotatey(180deg); --icon-color: rgb(var(--rgb-cyan)); }
-                          }
-                          .shape {
-                            --shape-animation: color 6s ease infinite;
-                          }
-                          @keyframes color {
-                            50% { --shape-color: rgba(var(--rgb-cyan), 0.2); }
-                          }
-                          ha-card {
-                            animation: wave 6s ease infinite;
-                          }
-                  - type: conditional
-                    conditions:
-                      - entity: switch.zariadki_v_komnate
-                        state: 'on'
-                    chip:
-                      entity: switch.zariadki_v_komnate
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: green
-                      icon: mdi:battery-high
-                      card_mod:
-                        style: |
-                          ha-card {
-                            animation: charge 3s steps(1) infinite;
-                          }
-                          @keyframes charge {
-                            0% { clip-path: polygon(0% 0%, 0% 100%, 34% 100%, 34% 24%, 67% 24%, 67% 84%, 34% 84%, 34% 100%, 100% 100%, 100% 0%); }
-                            20% { clip-path: polygon(0% 0%, 0% 100%, 34% 100%, 34% 24%, 67% 24%, 67% 64%, 34% 64%, 34% 100%, 100% 100%, 100% 0%); }
-                            40% { clip-path: polygon(0% 0%, 0% 100%, 34% 100%, 34% 24%, 67% 24%, 67% 44%, 34% 44%, 34% 100%, 100% 100%, 100% 0%); }
-                            60% { clip-path: polygon(0% 0%, 0% 100%, 34% 100%, 34% 24%, 67% 24%, 67% 24%, 34% 24%, 34% 100%, 100% 100%, 100% 0%); }
-                          }
-                alignment: end
+                icon_color: white
                 card_mod:
                   style: |
                     ha-card {
-                      --chip-box-shadow: none;
-                      --chip-background: none;
-                      --chip-spacing: 0;
-                    } 
-            card_mod:
-              style: |
-                ha-card {
-                  height: 102px;
-                  {% if is_state('light.komnata_osveshchenie', 'on') %}
-                    background: rgba(255, 152, 0, 0.1);
-                  {% endif %}
-                }
-          - type: custom:stack-in-card
+                      background: rgba(var(--rgb-card-background-color), 0.3) url( '/local/images/myroom.jpg' ) center no-repeat;
+                      background-size: cover;
+                      background-blend-mode: overlay;
+                    }
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-light-card
+                entity: light.switch_1
+                name: Свет
+                fill_container: true
+                use_light_color: false
+              - type: custom:mushroom-light-card
+                entity: light.nochnik_v_komnate
+                name: Ночник
+                fill_container: true
+                use_light_color: true
+                show_brightness_control: true
+                show_color_temp_control: false
+                show_color_control: false
+                collapsible_controls: true
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-light-card
+                entity: light.bra_v_komnate
+                name: Бра
+                fill_container: true
+                use_light_color: true
+                icon: mdi:wall-sconce
+                show_brightness_control: true
+                collapsible_controls: true
+              - type: custom:mushroom-light-card
+                entity: light.lava_lampa
+                name: Лава-лампа
+                fill_container: true
+                use_light_color: false
+                show_brightness_control: false
+                show_color_temp_control: false
+                show_color_control: false
+                collapsible_controls: false
+          - type: horizontal-stack
             cards:
               - type: custom:mushroom-template-card
-                primary: Спальня
-                secondary: '🌡️ {{ states(''sensor.climate_termo'') | round(0) }} °C'
-                icon: mdi:bed-king
-                entity: light.spalnia_svet
-                tap_action:
-                  action: navigate
-                  navigation_path: bedroom
-                hold_action:
-                  action: toggle
-                icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
+                entity: switch.10015c681a
+                primary: Комп
+                icon: mdi:rocket-launch
+                icon_color: '{{ ''blue'' if is_state(entity, ''on'') else ''disabled'' }}'
                 fill_container: true
-                layout: horizontal
-                multiline_secondary: false
+                tap_action:
+                  action: toggle
                 card_mod:
-                  style: |
-                    :host([dark-mode]) {
-                      background: rgba(var(--rgb-primary-background-color), 0.2);
-                    } 
-                    :host {
-                      background: rgba(var(--rgb-primary-text-color), 0.025);
-                      --mush-icon-size: 76px;
-                      height: 66px;
-                      margin-left: -18px !important;
-                    }
-              - type: custom:mushroom-chips-card
-                chips:
-                  - type: conditional
-                    conditions:
-                      - entity: light.spalnia_svet
-                        state: 'on'
-                    chip:
-                      entity: light.spalnia_svet
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:chandelier
-                  - type: conditional
-                    conditions:
-                      - entity: light.nochnik_v_spalne
-                        state: 'on'
-                    chip:
-                      entity: light.nochnik_v_spalne
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:wall-sconce
-                  - type: conditional
-                    conditions:
-                      - entity: light.vykliuchatel_ploshchadka
-                        state: 'on'
-                    chip:
-                      entity: light.vykliuchatel_ploshchadka
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:balcony
-                  - type: conditional
-                    conditions:
-                      - entity: switch.rozetka_v_spalne
-                        state: 'on'
-                    chip:
-                      entity: switch.rozetka_v_spalne
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: red
-                      icon: mdi:iron
-                      card_mod:
-                        style: |
-                          ha-card {
-                            animation: vroom 2s ease-in-out infinite;
-                          }
-                          .shape {
-                            clip-path: inset(0 0 0 0);
-                          }
-                          @keyframes vroom {
-                            49% { opacity: 1;}
-                            50% { transform: translate(-32px); opacity: 0; }
-                            51% { transform: translate(32px); opacity: 0; }
-                            52% { opacity: 1; }
-                          }
-                  - type: conditional
-                    conditions:
-                      - entity: binary_sensor.dd_ploshchadka_occupancy
-                        state: 'on'
-                    chip:
-                      type: template
-                      icon_color: green
-                      icon: mdi:motion-sensor
-                alignment: end
+                  style:
+                    mushroom-shape-icon$: |
+                      ha-icon {
+                      {% if is_state('switch.10015c681a', 'on') %}
+                        --icon-animation: thrust 100ms infinite, motion 3s ease-in-out infinite;
+                      {% endif %}
+                      }
+                      @keyframes thrust {
+                        0% { clip-path: polygon(0 0, 0 47%, 22% 57%, 28% 63%, 0 91%, 11% 100%, 37% 73%, 45% 77%, 55% 100%, 100% 100%, 100% 0%); }
+                        33% { clip-path: polygon(0 0, 0 47%, 24% 59%, 42% 76%, 54% 100%, 100% 100%, 100% 0); }
+                        66% { clip-path: polygon(0 0, 0 92%, 28% 64%, 36% 72%, 9% 100%, 100% 100%, 100% 0%); }
+                      }
+                      @keyframes motion {
+                        0%, 100% { transform: translateY(-2px) translateX(-3px); }
+                        50% { transform: translateY(3px) translateX(2px); }
+                      }
+              - type: custom:mushroom-entity-card
+                entity: media_player.xboxone
+                icon: mdi:microsoft-xbox
+                name: XBOX
+                icon_color: green
+                fill_container: true
+                tap_action:
+                  action: toggle
                 card_mod:
-                  style: |
-                    ha-card {
-                      --chip-box-shadow: none;
-                      --chip-background: none;
-                      --chip-spacing: 0;
-                    } 
-            card_mod:
-              style: |
-                ha-card {
-                  height: 102px;
-                  {% if is_state('light.spalnia_svet', 'on') %}
-                    background: rgba(255, 152, 0, 0.1);
-                  {% endif %}
-                }
+                  style:
+                    mushroom-shape-icon$: |
+                      ha-icon {
+                      {% if is_state('media_player.xboxone', 'on') %}
+                        --icon-animation: wave 6s ease infinite;
+                      {% endif %}
+                      }
+                      @keyframes wave {
+                        50% { transform: rotatey(180deg); --icon-color: rgb(var(--rgb-green)); }
+                      }
+                      .shape {
+                        --shape-animation: color 6s ease infinite;
+                      }
+                      @keyframes color {
+                        50% { --shape-color: rgba(var(--rgb-green), 0.2); }
+                      }
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: custom:mini-media-player
+                icon: mdi:amplifier
+                entity: media_player.yandex_station_lp00000000000002072500002e02f361
+                artwork: cover
+                sound_mode: icon
+                shortcuts:
+                  attribute: sound_mode
+                  buttons:
+                    - icon: mdi:account-voice
+                      id: Произнеси текст
+                      type: sound_mode
+                    - icon: mdi:robot
+                      id: Выполни команду
+                      type: sound_mode
+                    - icon: mdi:playlist-star
+                      id: включи мою любимую музыку вперемешку
+                      type: command
+                    - icon: mdi:heart
+                      id: лайк
+                      type: command
+                    - icon: mdi:heart-off
+                      id: снять лайк
+                      type: command
+                    - icon: mdi:baby-face-outline
+                      id: включи радионяню в спальне
+                      type: command
+                  columns: 6
+                hide:
+                  sound_mode: true
+                  runtime: false
+                tts:
+                  platform: yandex_station
       - type: horizontal-stack
         cards:
-          - type: custom:stack-in-card
-            cards:
-              - type: custom:mushroom-template-card
-                primary: Кухня
-                secondary: '🌡️ {{ states(''sensor.climate_termo'') | round(0) }} °C'
-                icon: mdi:silverware-fork-knife
-                entity: light.kukhnia_gruppa
-                tap_action:
-                  action: navigate
-                  navigation_path: kitchen
-                hold_action:
-                  action: toggle
-                icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
-                fill_container: true
-                layout: horizontal
-                multiline_secondary: false
-                card_mod:
-                  style: |
-                    :host([dark-mode]) {
-                      background: rgba(var(--rgb-primary-background-color), 0.2);
-                    } 
-                    :host {
-                      background: rgba(var(--rgb-primary-text-color), 0.025);
-                      --mush-icon-size: 76px;
-                      height: 66px;
-                      margin-left: -18px !important;
-                    }
-              - type: custom:mushroom-chips-card
-                chips:
-                  - type: conditional
-                    conditions:
-                      - entity: binary_sensor.datchik_utechki_vody_water_leak
-                        state: 'on'
-                    chip:
-                      type: template
-                      icon_color: light-blue
-                      icon: mdi:water-alert
-                      tap_action:
-                        action: more-info
-                      entity: binary_sensor.datchik_utechki_vody_water_leak
-                      card_mod:
-                        style: |
-                          ha-card {
-                            animation: blink 1s linear infinite;
-                          }
-                          @keyframes blink {
-                            50% {opacity: 0;}
-                          }  
-                  - type: conditional
-                    conditions:
-                      - entity: binary_sensor.datchik_utechki_gaza_gas
-                        state: 'on'
-                    chip:
-                      type: template
-                      icon_color: red
-                      icon: mdi:fire-alert
-                      tap_action:
-                        action: more-info
-                      entity: binary_sensor.datchik_utechki_gaza_gas
-                      card_mod:
-                        style: |
-                          ha-card {
-                            animation: blink 1s linear infinite;
-                          }
-                          @keyframes blink {
-                            50% {opacity: 0;}
-                          }  
-                  - type: conditional
-                    conditions:
-                      - entity: light.svetilnik_na_kukhne
-                        state: 'on'
-                    chip:
-                      entity: light.svetilnik_na_kukhne
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:ceiling-light
-                  - type: conditional
-                    conditions:
-                      - entity: light.podsvetka_na_kukhne
-                        state: 'on'
-                    chip:
-                      entity: light.podsvetka_na_kukhne
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:countertop
-                  - type: conditional
-                    conditions:
-                      - entity: input_boolean.chainik
-                        state: 'on'
-                    chip:
-                      entity: input_boolean.chainik
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: blue
-                      icon: mdi:kettle-steam
-                      card_mod:
-                        style: |
-                          @keyframes boil {
-                            0%, 100% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
-                            10% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); clip-path: polygon(0 0, 66% 10%, 67% 30%, 88% 52%, 100% 100%, 0 100%); }
-                            20% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
-                            30% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
-                            40% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
-                            50% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
-                            60% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
-                            70% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
-                            80% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
-                            90% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
-                          }
-                          ha-card {
-                            animation: boil linear infinite;
-                            animation-duration: 500ms;
-                          }
-                  - type: conditional
-                    conditions:
-                      - entity: switch.multivarka_rozetka
-                        state: 'on'
-                    chip:
-                      entity: switch.multivarka_rozetka
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: blue
-                      icon: mdi:pot-steam
-                      card_mod:
-                        style: |
-                          @keyframes steam {
-                            0%, 100% { clip-path: inset(0 0 0 0); }
-                            50% { clip-path: inset(39% 0 0 0); }
-                          }
-                          ha-card {
-                            animation: steam linear infinite;
-                            animation-duration: 2s;
-                          }
-                  - type: conditional
-                    conditions:
-                      - entity: switch.kofevarka
-                        state: 'on'
-                    chip:
-                      entity: switch.kofevarka
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: blue
-                      icon: mdi:coffee-maker
-                      card_mod:
-                        style: |
-                          @keyframes java {
-                            0%, 80%, 100% { clip-path: polygon(0 0, 100% 0, 100% 32%, 47% 32%, 47% 43%, 100% 43%, 100% 100%, 0 100%); }
-                            10% { clip-path: polygon(0 0, 100% 0, 100% 32%, 47% 32%, 47% 43%, 100% 43%, 100% 100%, 55% 100%, 55% 79%, 63% 76%, 67% 70%, 66% 54%, 42% 55%, 42% 70%, 47% 77%, 55% 80%, 57% 100%, 0 100%); }
-                            15% { clip-path: polygon(0 0, 100% 0, 100% 100%, 55% 100%, 55% 79%, 63% 76%, 67% 70%, 66% 54%, 42% 54%, 42% 70%, 47% 77%, 55% 80%, 55% 100%, 0 100%); }
-                            20% { clip-path: polygon(0 0, 100% 0, 100% 32%, 47% 32%, 47% 43%, 100% 43%, 100% 100%, 55% 100%, 55% 76%, 63% 76%, 67% 70%, 66% 54%, 42% 55%, 42% 70%, 47% 76%, 55% 76%, 57% 100%, 0 100%); }
-                            25% { clip-path: polygon(0 0, 100% 0, 100% 100%, 55% 100%, 55% 76%, 63% 76%, 67% 70%, 66% 54%, 42% 54%, 42% 70%, 47% 76%, 55% 76%, 56% 100%, 0 100%); }
-                            30% { clip-path: polygon(0 0, 100% 0, 100% 32%, 47% 32%, 47% 43%, 100% 43%, 100% 100%, 55% 100%, 55% 73%, 64% 73%, 66% 70%, 66% 55%, 42% 55%, 42% 69%, 44% 73%, 55% 73%, 57% 100%, 0 100%); }
-                            35% { clip-path: polygon(0 0, 100% 0, 100% 100%, 55% 100%, 55% 73%, 64% 73%, 66% 70%, 66% 55%, 42% 54%, 42% 69%, 44% 73%, 55% 73%, 56% 100%, 0 100%); }
-                            40% { clip-path: polygon(0 0, 100% 0, 100% 32%, 47% 32%, 47% 43%, 100% 43%, 100% 100%, 55% 100%, 55% 70%, 67% 70%, 66% 54%, 42% 54%, 42% 70%, 57% 70%, 57% 100%, 0 100%); }
-                            45% { clip-path: polygon(0 0, 100% 0, 100% 100%, 55% 100%, 55% 70%, 67% 70%, 66% 54%, 42% 54%, 42% 70%, 55% 70%, 56% 100%, 0 100%); }
-                            50% { clip-path: polygon(0 0, 100% 0, 100% 32%, 47% 32%, 47% 43%, 100% 43%, 100% 100%, 55% 100%, 55% 66%, 67% 65%, 66% 54%, 42% 54%, 42% 65%, 57% 65%, 57% 100%, 0 100%); }
-                            55% { clip-path: polygon(0 0, 100% 0, 100% 100%, 55% 100%, 55% 66%, 67% 65%, 66% 54%, 42% 54%, 42% 65%, 55% 65%, 56% 100%, 0 100%); }
-                            60% { clip-path: polygon(0 0, 100% 0, 100% 32%, 47% 32%, 47% 43%, 100% 43%, 100% 100%, 55% 100%, 55% 60%, 66% 60%, 66% 54%, 42% 54%, 42% 60%, 57% 60%, 57% 100%, 0 100%); }
-                            65% { clip-path: polygon(0 0, 100% 0, 100% 100%, 55% 100%, 55% 60%, 66% 60%, 66% 54%, 42% 54%, 42% 60%, 55% 60%, 56% 100%, 0 100%); }
-                            70% { clip-path: polygon(0 0, 100% 0, 100% 32%, 47% 32%, 47% 43%, 100% 43%, 100% 100%, 55% 100%, 55% 56%, 66% 56%, 66% 54%, 42% 54%, 42% 56%, 57% 56%, 57% 100%, 0 100%); }
-                            75% { clip-path: polygon(0 0, 100% 0, 100% 100%, 55% 100%, 55% 56%, 66% 56%, 66% 54%, 42% 54%, 42% 56%, 55% 56%, 55% 100%, 0 100%); }
-                          }
-                          ha-card {
-                            animation: java 4s linear infinite;
-                          }
-                  - type: conditional
-                    conditions:
-                      - entity: switch.posudomoika
-                        state: 'on'
-                    chip:
-                      entity: switch.posudomoika
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: blue
-                      icon: mdi:dishwasher
-                      card_mod:
-                        style: |
-                          @keyframes shake {
-                            0%, 100% { transform: translate(0, 0) rotate(0); }
-                            20%  { transform: translate(0.4px, -0.4px) rotate(-4deg); }
-                            40%  { transform: translate(-0.4px, 0.4px) rotate(4deg); }
-                            60%  { transform: translate(0.4px, 0.4px) rotate(-4deg); }
-                            80%  { transform: translate(-0.4px, -0.4px) rotate(4deg); }
-                          }
-                          @keyframes drum {
-                            50%  { clip-path: polygon(0 0, 0 100%, 35% 100%, 34% 68%, 60% 41%, 71% 56%, 65% 74%, 47% 79%, 32% 69%, 35% 100%, 100% 100%, 100% 0); }
-                          }
-                          ha-card {
-                            animation: shake linear infinite;
-                            animation-duration: 2s;
-                          }
-                  - type: conditional
-                    conditions:
-                      - entity: binary_sensor.dd_kukhnia_occupancy
-                        state: 'on'
-                    chip:
-                      entity: binary_sensor.dd_kukhnia_occupancy
-                      type: template
-                      icon_color: green
-                      icon: mdi:motion-sensor
-                alignment: end
-                card_mod:
-                  style: |
-                    ha-card {
-                      --chip-box-shadow: none;
-                      --chip-background: none;
-                      --chip-spacing: 0;
-                    } 
-            card_mod:
-              style: |
-                ha-card {
-                  height: 102px;
-                  {% if is_state('light.kukhnia_gruppa', 'on') %}
-                    background: rgba(255, 152, 0, 0.1);
-                  {% endif %}
-                }
-          - type: custom:stack-in-card
-            cards:
-              - type: custom:mushroom-template-card
-                primary: Туалет
-                secondary: '🌡️ {{ states(''sensor.temperatura'') | round(0) }} °C'
-                icon: mdi:toilet
-                entity: light.tualet_osveshchenie
-                tap_action:
-                  action: navigate
-                  navigation_path: toilet
-                hold_action:
-                  action: toggle
-                icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
-                fill_container: true
-                layout: horizontal
-                multiline_secondary: false
-                card_mod:
-                  style: |
-                    :host([dark-mode]) {
-                      background: rgba(var(--rgb-primary-background-color), 0.2);
-                    } 
-                    :host {
-                      background: rgba(var(--rgb-primary-text-color), 0.025);
-                      --mush-icon-size: 76px;
-                      height: 66px;
-                      margin-left: -18px !important;
-                    }
-              - type: custom:mushroom-chips-card
-                chips:
-                  - type: conditional
-                    conditions:
-                      - entity: light.svetilnik_v_tualete
-                        state: 'on'
-                    chip:
-                      entity: light.svetilnik_v_tualete
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:ceiling-light
-                  - type: conditional
-                    conditions:
-                      - entity: light.controller_dimmable_6edba1
-                        state: 'on'
-                    chip:
-                      entity: light.controller_dimmable_6edba1
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:toilet
-                  - type: conditional
-                    conditions:
-                      - entity: light.svetilnik_v_garderobe
-                        state: 'on'
-                    chip:
-                      entity: light.svetilnik_v_garderobe
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:hanger
-                  - type: conditional
-                    conditions:
-                      - entity: switch.rele_tualet
-                        state: 'on'
-                    chip:
-                      entity: switch.rele_tualet
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: blue
-                      icon: mdi:fan
-                      card_mod:
-                        style: |
-                          @keyframes rotation {
-                            0% {
-                              transform: rotate(0deg);
-                            }
-                            100% {
-                              transform: rotate(360deg);
-                            }
-                          }
-                          ha-card {
-                            animation: rotation linear infinite;
-                            animation-duration: 2s;
-                          }
-                  - type: conditional
-                    conditions:
-                      - entity: binary_sensor.dd_tualet_occupancy
-                        state: 'on'
-                    chip:
-                      type: template
-                      icon_color: green
-                      icon: mdi:motion-sensor
-                alignment: end
-                card_mod:
-                  style: |
-                    ha-card {
-                      --chip-box-shadow: none;
-                      --chip-background: none;
-                      --chip-spacing: 0;
-                    } 
-            card_mod:
-              style: |
-                ha-card {
-                  height: 102px;
-                  {% if is_state('light.tualet_osveshchenie', 'on') %}
-                    background: rgba(255, 152, 0, 0.1);
-                  {% endif %}
-                }
-      - type: horizontal-stack
-        cards:
-          - type: custom:stack-in-card
-            cards:
-              - type: custom:mushroom-template-card
-                primary: Ванная
-                secondary: 🌡️ {{ states('sensor.dtv_temperature') | round(0) }} °C
-                icon: mdi:bathtub
-                entity: light.vannaia_svet
-                tap_action:
-                  action: navigate
-                  navigation_path: bath
-                hold_action:
-                  action: toggle
-                icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
-                fill_container: true
-                layout: horizontal
-                multiline_secondary: false
-                card_mod:
-                  style: |
-                    :host([dark-mode]) {
-                      background: rgba(var(--rgb-primary-background-color), 0.2);
-                    } 
-                    :host {
-                      background: rgba(var(--rgb-primary-text-color), 0.025);
-                      --mush-icon-size: 76px;
-                      height: 66px;
-                      margin-left: -18px !important;
-                    }
-              - type: custom:mushroom-chips-card
-                chips:
-                  - type: conditional
-                    conditions:
-                      - entity: light.vannaia_svet
-                        state: 'on'
-                    chip:
-                      entity: light.vannaia_svet
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:ceiling-light
-                  - type: conditional
-                    conditions:
-                      - entity: binary_sensor.dd_vannaia_occupancy
-                        state: 'on'
-                    chip:
-                      entity: binary_sensor.dd_vannaia_occupancy
-                      type: template
-                      icon_color: green
-                      icon: mdi:motion-sensor
-                alignment: end
-                card_mod:
-                  style: |
-                    ha-card {
-                      --chip-box-shadow: none;
-                      --chip-background: none;
-                      --chip-spacing: 0;
-                    } 
-            card_mod:
-              style: |
-                ha-card {
-                  height: 102px;
-                  {% if is_state('light.vannaia_svet', 'on') %}
-                    background: rgba(255, 152, 0, 0.1);
-                  {% endif %}
-                }
-          - type: custom:stack-in-card
-            cards:
-              - type: custom:mushroom-template-card
-                primary: Прихожая
-                secondary: '🌡️ {{ states(''sensor.dtv_temperature'') | round(0) }} °C'
-                icon: mdi:shoe-print
-                entity: light.prikhozhaia_osveshchenie
-                tap_action:
-                  action: navigate
-                  navigation_path: hall
-                hold_action:
-                  action: toggle
-                icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
-                fill_container: true
-                layout: horizontal
-                multiline_secondary: false
-                card_mod:
-                  style: |
-                    :host([dark-mode]) {
-                      background: rgba(var(--rgb-primary-background-color), 0.2);
-                    } 
-                    :host {
-                      background: rgba(var(--rgb-primary-text-color), 0.025);
-                      --mush-icon-size: 76px;
-                      height: 66px;
-                      margin-left: -18px !important;
-                    }
-              - type: custom:mushroom-chips-card
-                chips:
-                  - type: conditional
-                    conditions:
-                      - entity: light.scet_v_prihozhei
-                        state: 'on'
-                    chip:
-                      entity: light.scet_v_prihozhei
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:ceiling-light
-                  - type: conditional
-                    conditions:
-                      - entity: light.nochnik_v_prikhozhei
-                        state: 'on'
-                    chip:
-                      entity: light.nochnik_v_prikhozhei
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:wall-sconce
-                  - type: conditional
-                    conditions:
-                      - entity: light.svet_na_lestnice
-                        state: 'on'
-                    chip:
-                      entity: light.svet_na_lestnice
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:stairs-up
-                  - type: conditional
-                    conditions:
-                      - entity: light.svet_v_chulane
-                        state: 'on'
-                    chip:
-                      entity: light.svet_v_chulane
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:lightbulb-on
-                  - type: conditional
-                    conditions:
-                      - entity: light.svet_v_koridore
-                        state: 'on'
-                    chip:
-                      entity: light.svet_v_koridore
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:door
-                      card_mod:
-                        style: |
-                            ha-card {
-                              animation: open 6s ease-in-out infinite;
-                              transform-origin: 30%;
-                            }
-                            @keyframes open {
-                              0%, 66% { transform: rotateY(0deg); }
-                              33% { transform: rotateY(-120deg); }
-                            }
-                            .shape {
-                              perspective: 45px;
-                            }
-                  - type: conditional
-                    conditions:
-                      - entity: binary_sensor.dd_prikhozhaia_occupancy
-                        state: 'on'
-                    chip:
-                      type: template
-                      icon_color: green
-                      icon: mdi:motion-sensor
-                alignment: end
-                card_mod:
-                  style: |
-                    ha-card {
-                      --chip-box-shadow: none;
-                      --chip-background: none;
-                      --chip-spacing: 0;
-                    } 
-            card_mod:
-              style: |
-                ha-card {
-                  height: 102px;
-                  {% if is_state('light.prikhozhaia_osveshchenie', 'on') %}
-                    background: rgba(255, 152, 0, 0.1);
-                  {% endif %}
-                }
-      - type: horizontal-stack
-        cards:
-          - type: custom:stack-in-card
-            cards:
-              - type: custom:mushroom-template-card
-                primary: Зал
-                secondary: 🌡️ {{ states('sensor.climate_termo') | round(0) }} °C
-                icon: mdi:chandelier
-                entity: light.zal_osveshchenie
-                tap_action:
-                  action: navigate
-                  navigation_path: living
-                hold_action:
-                  action: toggle
-                icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
-                fill_container: true
-                layout: horizontal
-                multiline_secondary: false
-                card_mod:
-                  style: |
-                    :host([dark-mode]) {
-                      background: rgba(var(--rgb-primary-background-color), 0.2);
-                    } 
-                    :host {
-                      background: rgba(var(--rgb-primary-text-color), 0.025);
-                      --mush-icon-size: 76px;
-                      height: 66px;
-                      margin-left: -18px !important;
-                    }
-              - type: custom:mushroom-chips-card
-                chips:
-                  - type: conditional
-                    conditions:
-                      - entity: light.zal_osveshchenie
-                        state: 'on'
-                    chip:
-                      entity: light.zal_osveshchenie
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:chandelier
-                  - type: conditional
-                    conditions:
-                      - entity: switch.rozetka_zal
-                        state: 'on'
-                    chip:
-                      entity: switch.rozetka_zal
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: blue
-                      icon: mdi:power-socket-de
-                alignment: end
-                card_mod:
-                  style: |
-                    ha-card {
-                      --chip-box-shadow: none;
-                      --chip-background: none;
-                      --chip-spacing: 0;
-                    } 
-            card_mod:
-              style: |
-                ha-card {
-                  height: 102px;
-                  {% if is_state('light.zal_osveshchenie', 'on') %}
-                    background: rgba(255, 152, 0, 0.1);
-                  {% endif %}
-                }
-          - type: custom:stack-in-card
-            cards:
-              - type: custom:mushroom-template-card
-                primary: Детская
-                secondary: '🌡️ {{ states(''sensor.climate_termo'') | round(0) }} °C'
-                icon: mdi:teddy-bear
-                entity: light.detskaia
-                tap_action:
-                  action: navigate
-                  navigation_path: children
-                hold_action:
-                  action: toggle
-                icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
-                fill_container: true
-                layout: horizontal
-                multiline_secondary: false
-                card_mod:
-                  style: |
-                    :host([dark-mode]) {
-                      background: rgba(var(--rgb-primary-background-color), 0.2);
-                    } 
-                    :host {
-                      background: rgba(var(--rgb-primary-text-color), 0.025);
-                      --mush-icon-size: 76px;
-                      height: 66px;
-                      margin-left: -18px !important;
-                    }
-              - type: custom:mushroom-chips-card
-                chips:
-                  - type: conditional
-                    conditions:
-                      - entity: light.svet_v_detskoi
-                        state: 'on'
-                    chip:
-                      entity: light.svet_v_detskoi
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:chandelier
-                  - type: conditional
-                    conditions:
-                      - entity: light.nochnik_v_detskoi
-                        state: 'on'
-                    chip:
-                      entity: light.nochnik_v_detskoi
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:wall-sconce
-                  - type: conditional
-                    conditions:
-                      - entity: binary_sensor.dd_detskaia_occupancy
-                        state: 'on'
-                    chip:
-                      type: template
-                      icon_color: green
-                      icon: mdi:motion-sensor
-                alignment: end
-                card_mod:
-                  style: |
-                    ha-card {
-                      --chip-box-shadow: none;
-                      --chip-background: none;
-                      --chip-spacing: 0;
-                    } 
-            card_mod:
-              style: |
-                ha-card {
-                  height: 102px;
-                  {% if is_state('light.detskaia', 'on') %}
-                    background: rgba(255, 152, 0, 0.1);
-                  {% endif %}
-                }
-      - type: horizontal-stack
-        cards:
-          - type: custom:stack-in-card
-            cards:
-              - type: custom:mushroom-template-card
-                primary: Баня
-                secondary: 🌡️ {{ states('sensor.banya_temperature_2') | round(0) }} °C
-                icon: mdi:home-thermometer
-                entity: switch.bania
-                tap_action:
-                  action: navigate
-                  navigation_path: sauna
-                hold_action:
-                  action: toggle
-                icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
-                fill_container: true
-                layout: horizontal
-                multiline_secondary: false
-                card_mod:
-                  style: |
-                    :host([dark-mode]) {
-                      background: rgba(var(--rgb-primary-background-color), 0.2);
-                    } 
-                    :host {
-                      background: rgba(var(--rgb-primary-text-color), 0.025);
-                      --mush-icon-size: 76px;
-                      height: 66px;
-                      margin-left: -18px !important;
-                    }
-              - type: custom:mushroom-chips-card
-                chips:
-                  - type: conditional
-                    conditions:
-                      - entity: switch.bania
-                        state: 'on'
-                    chip:
-                      entity: switch.bania
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:flash
-                  - type: conditional
-                    conditions:
-                      - entity: light.banya
-                        state: 'on'
-                    chip:
-                      entity: light.banya
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:lightbulb-on
-                      card_mod:
-                        style: |
-                            ha-card {
-                              animation: eureka 1.8s infinite;
-                            }
-                            @keyframes eureka {
-                              0%, 45%, 55%, 100% { transform: translateY(0) scale(1); clip-path: polygon(20% 100%, 21% 38%, 36% 22%, 62% 21%, 79% 37%, 80% 100%, 53% 100%, 55% 67%, 62% 62%, 66% 55%, 67% 46%, 62% 38%, 55% 34%, 47% 34%, 39% 37%, 34% 44%, 33% 53%, 36% 60%, 41% 64%, 45% 66%, 45% 76%, 56% 76%, 54% 100%); }
-                              10%, 40% { transform: translateY(-5px) scale(1.12); clip-path: inset(0 0 0 0); }
-                              50% { transform: translateY(-2px) }
-                            }
-                  - type: conditional
-                    conditions:
-                      - entity: switch.voda_v_baniu
-                        state: 'on'
-                    chip:
-                      entity: switch.voda_v_baniu
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: blue
-                      icon: mdi:water-pump
-                      card_mod:
-                        style: |
-                            ha-card {
-                              animation: drip 2s infinite; 
-                            }
-                            @keyframes drip {
-                              0%, 100% { clip-path: inset(0 0 0 0); }
-                              15%, 85% { clip-path: polygon(0 0, 100% 0, 100% 57%, 64% 57%, 64% 100%, 0 100%); }
-                            }
-                alignment: end
-                card_mod:
-                  style: |
-                    ha-card {
-                      --chip-box-shadow: none;
-                      --chip-background: none;
-                      --chip-spacing: 0;
-                    } 
-            card_mod:
-              style: |
-                ha-card {
-                  height: 102px;
-                  {% if is_state('switch.bania', 'on') %}
-                    background: rgba(255, 152, 0, 0.1);
-                  {% endif %}
-                }
-          - type: custom:stack-in-card
-            cards:
-              - type: custom:mushroom-template-card
-                primary: Беседка
-                secondary: |
-                  {{ 
-                  "🌡️ " ~ state_attr('weather.dom', 'temperature') | round(0) ~ " °C" 
-                  if is_state("sensor.temperatura_besedka", "unavailable") 
-                  else 
-                  "🌡️ " ~ states("sensor.temperatura_besedka") | round(0) ~ " °C" 
-                  }}
-                icon: mdi:greenhouse
-                entity: switch.besedka
-                tap_action:
-                  action: navigate
-                  navigation_path: alcove
-                hold_action:
-                  action: toggle
-                icon_color: '{{ ''amber'' if is_state(entity, ''on'') else ''disabled'' }}'
-                fill_container: true
-                layout: horizontal
-                multiline_secondary: false
-                card_mod:
-                  style: |
-                    :host([dark-mode]) {
-                      background: rgba(var(--rgb-primary-background-color), 0.2);
-                    } 
-                    :host {
-                      background: rgba(var(--rgb-primary-text-color), 0.025);
-                      --mush-icon-size: 76px;
-                      height: 66px;
-                      margin-left: -18px !important;
-                    }
-              - type: custom:mushroom-chips-card
-                chips:
-                  - type: conditional
-                    conditions:
-                      - entity: switch.besedka
-                        state: 'on'
-                    chip:
-                      entity: switch.besedka
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:flash
-                      card_mod:
-                        style: |
-                            ha-card {
-                              animation: flash 4s linear infinite;
-                            }
-                            @keyframes flash {
-                              0%, 4%, 8%, 12%, 16%, 20%, 24%, 28%, 32%, 100% { transform: translate(0px,0px); }
-                              2% { transform: translate(-0.3px, 0px); }
-                              6% { transform: translate(0.3px, 0px); }
-                              10% { transform: translate(-0.2px, 0px); }
-                              14% { transform: translate(0.2px, 0px); }
-                              18% { transform: translate(-0.2px, 0px); }
-                              22% { transform: translate(0.5px, 0px); }
-                              26% { transform: translate(-0.5px, 0px); }
-                              34% { transform: translate(-1px, 5px); --icon-color: rgb(var(--rgb-amber)); }
-                              38% { transform: translate(0px, 0px); --icon-color: rgb(var(--rgb-white)); }
-                              40% { --icon-color: rgb(var(--rgb-amber)); }
-                            }
-                  - type: conditional
-                    conditions:
-                      - entity: light.besedka
-                        state: 'on'
-                    chip:
-                      entity: light.besedka
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:lightbulb-on
-                      card_mod:
-                        style: |
-                            ha-card {
-                              animation: eureka 1.8s infinite;
-                            }
-                            @keyframes eureka {
-                              0%, 45%, 55%, 100% { transform: translateY(0) scale(1); clip-path: polygon(20% 100%, 21% 38%, 36% 22%, 62% 21%, 79% 37%, 80% 100%, 53% 100%, 55% 67%, 62% 62%, 66% 55%, 67% 46%, 62% 38%, 55% 34%, 47% 34%, 39% 37%, 34% 44%, 33% 53%, 36% 60%, 41% 64%, 45% 66%, 45% 76%, 56% 76%, 54% 100%); }
-                              10%, 40% { transform: translateY(-5px) scale(1.12); clip-path: inset(0 0 0 0); }
-                              50% { transform: translateY(-2px) }
-                            }
-                  - type: conditional
-                    conditions:
-                      - entity: light.svet_v_besedke
-                        state: 'on'
-                    chip:
-                      entity: light.svet_v_besedke
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: amber
-                      icon: mdi:ceiling-light
-                  - type: conditional
-                    conditions:
-                      - entity: switch.samovar
-                        state: 'on'
-                    chip:
-                      entity: switch.samovar
-                      tap_action:
-                        action: toggle
-                      type: template
-                      icon_color: blue
-                      icon: mdi:kettle-steam
-                      card_mod:
-                        style: |
-                          @keyframes boil {
-                            0%, 100% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
-                            10% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); clip-path: polygon(0 0, 66% 10%, 67% 30%, 88% 52%, 100% 100%, 0 100%); }
-                            20% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
-                            30% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
-                            40% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
-                            50% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
-                            60% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
-                            70% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
-                            80% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
-                            90% { transform: translate({{ range(-20, 20) | random / 10 }}px, {{ range(-20, 20) | random / 10 }}px) rotate({{ range(-15, 15) | random }}deg); }
-                          }
-                          ha-card {
-                            animation: boil linear infinite;
-                            animation-duration: 500ms;
-                          }
-                alignment: end
-                card_mod:
-                  style: |
-                    ha-card {
-                      --chip-box-shadow: none;
-                      --chip-background: none;
-                      --chip-spacing: 0;
-                    } 
-            card_mod:
-              style: |
-                ha-card {
-                  height: 102px;
-                  {% if is_state('switch.besedka', 'on') %}
-                    background: rgba(255, 152, 0, 0.1);
-                  {% endif %}
-                }
+          - type: custom:mini-media-player
+            icon: mdi:youtube-tv
+            entity: media_player.hitv
+            artwork: cover
+            name: ТВ
+            sound_mode: icon
+            shortcuts:
+              attribute: service
+              buttons:
+                - icon: mdi:television-classic
+                  id: script.tv
+                  type: script
+                - icon: mdi:laptop
+                  id: Вscript.pc
+                  type: script
+                - icon: mdi:microsoft-xbox
+                  id: script.xboxsource
+                  type: script
+                - icon: mdi:home
+                  id: script.hihome
+                  type: script
+                - icon: mdi:youtube-subscription
+                  id: com.yandex.tv.ytplayer
+                  type: source
+                - icon: mdi:alpha-j-box
+                  id: org.jellyfin.androidtv
+                  type: source
+              columns: 6
+            hide:
+              sound_mode: true
+              runtime: true
