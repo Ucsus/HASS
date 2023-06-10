@@ -1,0 +1,186 @@
+esphome:
+  name: greenhouse
+  friendly_name: Greenhouse
+
+esp8266:
+  board: esp01_1m
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "EGUC4wtnrhz8FnDWgTyk/xxgthWnZTrtCe4J7dqm+ZI="
+
+ota:
+  password: "b5461bfe54592f3a2501462b2f6c1d26"
+
+wifi:
+  ssid: !secret
+  password: !secret
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Greenhouse Fallback Hotspot"
+    password: "luaNRpDK4F5h"
+
+web_server:
+  port: 80
+
+captive_portal:
+
+cd74hc4067:
+  - id: cd74hc4067_1
+    pin_s0: GPIO16
+    pin_s1: GPIO5
+    pin_s2: GPIO4
+    pin_s3: GPIO0
+
+binary_sensor:
+  - platform: gpio
+    pin: GPIO12
+    name: "greenhouse_motion"
+    id: ghmotion
+    device_class: motion
+    on_press:
+      then:
+        - lambda: |-
+            id(backlight).publish_state(true);
+            id(backlight).publish_state(false);
+  - platform: template
+    id: backlight
+    filters:
+      - delayed_off: 90s
+    on_press:
+      then:
+        - lambda: |-
+            id(mydisplay).backlight();
+    on_release:
+      then:
+        - lambda: |-
+            id(mydisplay).no_backlight();
+
+sensor:
+  - platform: dht
+    pin: GPIO14
+    temperature:
+      name: "Greenhouse Temperature"
+      id: "ght"
+      device_class: "temperature"
+      unit_of_measurement: "°C"
+      accuracy_decimals: 0
+    humidity:
+      name: "Greenhouse Humidity"
+      id: "ghh"
+      device_class: "humidity"
+      unit_of_measurement: "%"
+      accuracy_decimals: 0
+    update_interval: 10s
+
+  - platform: adc
+    id: adc_sensor
+    pin: A0
+  
+  - platform: cd74hc4067
+    name: "Soil Moisture"
+    id: adc_0
+    sensor: adc_sensor
+    number: 0
+    update_interval: 10s
+    accuracy_decimals: 0
+    unit_of_measurement: "%"
+    filters:
+    - median:
+        window_size: 7
+        send_every: 4
+        send_first_at: 1
+    - calibrate_linear:
+        - 0.70 -> 100
+        - 1.00 -> 0
+    - lambda: |
+        if (x < 0) return 0; 
+        else if (x > 100) return 100;
+        else return (x);
+
+  - platform: cd74hc4067
+    name: "Luminosity"
+    id: adc_1
+    sensor: adc_sensor
+    update_interval: 10s
+    unit_of_measurement: lx
+    number: 1
+    filters:
+      - lambda: |-
+          return (x / 10000.0) * 2000000.0;
+
+  - platform: cd74hc4067
+    name: "Rain sensor"
+    id: adc_2
+    sensor: adc_sensor
+    update_interval: 10s
+    number: 2
+    accuracy_decimals: 0
+    unit_of_measurement: "%"
+    filters:
+    - median:
+        window_size: 7
+        send_every: 4
+        send_first_at: 1
+    - calibrate_linear:
+        - 0.40 -> 100
+        - 1.00 -> 0
+    - lambda: |
+        if (x < 0) return 0; 
+        else if (x > 100) return 100;
+        else return (x);
+
+    
+i2c:
+  sda: GPIO13
+  scl: GPIO15
+  scan: true
+
+time:
+- platform: homeassistant
+  id: ntp
+  
+display:
+  - platform: lcd_pcf8574
+    dimensions: 16x2
+    id: mydisplay
+    address: 0x27
+    lambda: |-
+          switch (id(page)){
+            case 1:
+              it.printf(6, 0, "%.1f", id(ght).state);
+              it.printf(7, 1, "%.0f", id(ghh).state);
+              it.print(0, 0, "Temp:");
+              it.print(0, 1, "Vlazh:");
+              it.print(10, 0, "C");
+              it.print(9, 1, "%");
+              
+              break;
+            case 2:
+              it.printf(7, 0, "%.0f", id(adc_0).state);
+              it.printf(7, 1, "%.0f", id(adc_2).state);
+              it.print(0, 0, "Pochva:");
+              it.print(0, 1, "Svet:");
+              it.print(10, 0, "%");
+              it.print(9, 1, "lx");
+              break;
+          }
+
+globals:
+- id: page
+  type: int
+  initial_value: "1"
+
+interval:
+- interval: 5s
+  then:
+    - lambda: |-
+        id(page) = (id(page) + 1);
+        if (id(page) > 2) {
+          id(page) = 1;
+        }
